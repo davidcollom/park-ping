@@ -31,7 +31,7 @@ public final class MainActivity extends Activity {
     private String page = "Nearby";
     private int generation;
     private long refreshed;
-    private int background, ink, muted, card, line, accent, onAccent, soft;
+    private int background, ink, muted, card, line, accent, onAccent, purple, onPurple, soft;
     private final Runnable ticker = new Runnable() {
         @Override public void run() {
             updateSession();
@@ -56,6 +56,8 @@ public final class MainActivity extends Activity {
         line = Color.parseColor(dark ? "#353D53" : "#E1E2ED");
         accent = Color.parseColor(dark ? "#72D8C7" : "#08786F");
         onAccent = Color.parseColor(dark ? "#102E2B" : "#FFFFFF");
+        purple = accent;
+        onPurple = onAccent;
         soft = Color.parseColor(dark ? "#203B3A" : "#E3F5F0");
     }
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
