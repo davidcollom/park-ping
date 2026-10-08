@@ -20,12 +20,12 @@ Technical reference for contributors. For the visitor-facing overview, see [the 
 
 ## Validation and limitations
 
-- Compiled all native app classes against Android API 35.
+- Compiled all native app classes against Android API 36.
 - Passed 26 pure Java alert-decision checks, including stale data, invalid/missing waits, location accuracy, boundary conditions, cooldowns and reopening rules.
-- Packaged the APK with Android SDK Build Tools 35.0.0; aligned it and verified its APK v2/v3 signatures.
+- Packaged the APK with Android SDK Build Tools 36.0.0; aligned it and verified its APK v2/v3 signatures.
 - Inspected the public feed's live JSON contract and park identifiers while implementing the adapter.
-- **Not yet tested on a physical Android device or emulator.** Installation, screen layouts, permission flows, notification delivery and screen-off operation need device testing.
-- Gradle repository resolution was unavailable in the creation environment, so the supplied APK was produced with the included dependency-free SDK build script. Gradle lint has not run. The source includes a conventional Gradle project. Current CI runs the Java rule checks and SDK-only APK build; Gradle lint is launch work tracked in issue #3.
+- **Not yet tested on a physical Android device or emulator.** Installation, screen layouts, permission flows, notification delivery and screen-off operation need device testing on Android 13, 15 and 16.
+- Current CI runs the Java rule checks, Gradle lint/build and SDK-only APK build. Device permission, notification, screen-off and layout checks remain manual.
 - Android power saving can delay polling or stop the service. No exact delivery interval is promised.
 - Queue times are posted estimates and can change before you arrive. `lastUpdated` is conservatively used for freshness; a provider retaining older timestamps for unchanged data can suppress otherwise useful alerts.
 - The UI keeps the previous successful snapshot when a refresh fails. Its age labels remain visible; the monitor never sends notifications from a cached snapshot.
@@ -58,7 +58,7 @@ For key creation and exact upload commands, see [SIGNING.md](../SIGNING.md).
 
 ## Build and maintain
 
-Java 17 and Android Studio / Android SDK are required. Application ID: `uk.co.collom.parkping`. Minimum Android version: Android 8.0 (API 26); target/compile SDK: 35.
+Java 17 and Android Studio / Android SDK are required. Application ID: `uk.co.collom.parkping`. Minimum Android version: Android 8.0 (API 26); target/compile SDK: 36.
 
 Standard build:
 
@@ -67,7 +67,7 @@ Standard build:
 ./gradlew assembleDebug lintDebug
 ```
 
-If a wrapper is not available, install Gradle 8.11.1 and run `gradle assembleDebug lintDebug`. Open the project folder in Android Studio to manage SDK setup and run on a connected device.
+If a wrapper is not available, install Gradle 8.11.1 and run `gradle lintDebug assembleDebug`. Open the project folder in Android Studio to manage SDK setup and run on a connected device.
 
 SDK-only fallback (Python 3 is used only for resource packaging):
 
@@ -78,7 +78,7 @@ export ANDROID_HOME=/path/to/android-sdk
 ./build-apk.sh
 ```
 
-Install SDK platform `android-35` and Build Tools `35.0.0` first. The fallback generates a development signing key in `.local-signing/` (git-ignored); keep the key to produce installable updates with the same signature. Production releases require a separate release signing setup. The generated output is `app/build/manual/park-ping-0.1.0.apk`.
+Install SDK platform `android-36` and Build Tools `36.0.0` first. The fallback generates a development signing key in `.local-signing/` (git-ignored); keep the key to produce installable updates with the same signature. Production releases require a separate release signing setup. The generated output is `app/build/manual/park-ping-0.1.0.apk`.
 
 Code structure:
 

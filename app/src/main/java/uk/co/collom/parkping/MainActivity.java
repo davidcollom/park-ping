@@ -85,7 +85,8 @@ public final class MainActivity extends Activity {
         screen = vertical(); screen.setBackgroundColor(background); screen.setPadding(dp(18), dp(8), dp(18), 0);
         screen.setOnApplyWindowInsetsListener((v, insets) -> {
             if (Build.VERSION.SDK_INT >= 30) {
-                android.graphics.Insets bars = insets.getInsets(WindowInsets.Type.systemBars());
+                android.graphics.Insets bars = insets.getInsets(
+                        WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
                 v.setPadding(dp(18) + bars.left, dp(8) + bars.top, dp(18) + bars.right, bars.bottom);
             } else v.setPadding(dp(18), dp(8) + insets.getSystemWindowInsetTop(), dp(18), insets.getSystemWindowInsetBottom());
             return insets;

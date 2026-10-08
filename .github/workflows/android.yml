@@ -27,9 +27,11 @@ jobs:
         with:
           packages: platform-tools
       - name: Install pinned Android SDK packages
-        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
       - name: Check alert behaviour
         run: ./test.sh
+      - name: Run Gradle lint and build
+        run: ./gradlew --no-daemon lintDebug assembleDebug
       - name: Build and verify development APK
         env:
           PARKPING_APK_NAME: park-ping-test.apk
