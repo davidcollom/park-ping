@@ -125,14 +125,17 @@ jobs:
               exit 1
             fi
             jarsigner -verify "$bundle"
+            umask 077
+            printf '%s' "$UPLOAD_KEYSTORE_PASSWORD" > "$RUNNER_TEMP/bundletool-keystore-password"
+            printf '%s' "$UPLOAD_KEY_PASSWORD" > "$RUNNER_TEMP/bundletool-key-password"
             java -jar "$RUNNER_TEMP/bundletool.jar" build-apks \
               --bundle="$bundle" \
               --output="$RUNNER_TEMP/park-ping.apks" \
               --mode=universal \
               --ks="$RUNNER_TEMP/park-ping-upload.p12" \
               --ks-key-alias="$UPLOAD_KEY_ALIAS" \
-              --ks-pass=env:UPLOAD_KEYSTORE_PASSWORD \
-              --key-pass=env:UPLOAD_KEY_PASSWORD
+              --ks-pass="file:$RUNNER_TEMP/bundletool-keystore-password" \
+              --key-pass="file:$RUNNER_TEMP/bundletool-key-password"
             unzip -p "$RUNNER_TEMP/park-ping.apks" universal.apk > dist/artifact/park-ping-play-universal.apk
             "$ANDROID_HOME/build-tools/$ANDROID_BUILD_TOOLS_VERSION/apksigner" verify --verbose dist/artifact/park-ping-play-universal.apk
             cp "$bundle" dist/release/park-ping-play.aab
@@ -196,7 +199,13 @@ jobs:
           if [[ "$UPLOAD_SIGNING" == true ]]; then
             printf '\nIncludes park-ping-play.aab signed with the configured Play upload key. The AAB still requires Play App Signing enrollment and a successful internal-track upload.\n' >> "$RUNNER_TEMP/release-notes.md"
           fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+            -f tag_name="$RELEASE_TAG" -f configuration_file_path=.github/release.yml \
+            --jq .body > "$RUNNER_TEMP/generated-changelog.md"
+          printf '\n## Changes in this release\n\n' >> "$RUNNER_TEMP/release-notes.md"
+          cat "$RUNNER_TEMP/generated-changelog.md" >> "$RUNNER_TEMP/release-notes.md"
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md" --repo "$GITHUB_REPOSITORY"
             gh release upload "$RELEASE_TAG" dist/release/* --clobber --repo "$GITHUB_REPOSITORY"
           else
             gh release create "$RELEASE_TAG" dist/release/* --verify-tag --prerelease \
@@ -205,4 +214,4 @@ jobs:
           fi
       - name: Remove signing material
         if: always()
-        run: rm -f "$RUNNER_TEMP/park-ping.keystore" "$RUNNER_TEMP/park-ping-upload.p12" "$RUNNER_TEMP/bundletool.jar"
+        run: rm -f "$RUNNER_TEMP/park-ping.keystore" "$RUNNER_TEMP/park-ping-upload.p12" "$RUNNER_TEMP/bundletool-keystore-password" "$RUNNER_TEMP/bundletool-key-password" "$RUNNER_TEMP/bundletool.jar"
