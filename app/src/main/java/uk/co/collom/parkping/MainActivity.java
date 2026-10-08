@@ -99,16 +99,18 @@ public final class MainActivity extends Activity {
         Spinner parks = new Spinner(this);
         ArrayAdapter<Models.Park> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Models.PARKS);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); parks.setAdapter(adapter); parks.setSelection(store.parkIndex());
-        parks.setId(View.generateViewId()); parks.setContentDescription("Choose a park to monitor");
+        parks.setId(View.generateViewId());
         parkLabel.setLabelFor(parks.getId()); screen.addView(parkLabel);
         parks.setMinimumHeight(dp(48)); screen.addView(parks, new LinearLayout.LayoutParams(-1, ViewGroup.LayoutParams.WRAP_CONTENT));
         parks.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override public void onNothingSelected(AdapterView<?> p) { }
             @Override public void onItemSelected(AdapterView<?> p, View v, int position, long id) {
                 if (position == store.parkIndex()) return;
+                boolean wasActive = MonitorService.active;
                 stopService(new Intent(MainActivity.this, MonitorService.class));
                 store.setPark(position); generation++; rides = new ArrayList<>(); refreshed = 0; loading = false;
                 render(); refresh(); updateSession();
+                if (wasActive) message("Park changed. Park mode stopped; start it again to monitor this park.");
             }
         });
         LinearLayout session = vertical(); session.setPadding(dp(12), dp(10), dp(12), dp(10)); session.setBackground(surface(soft, 16, false));
@@ -247,7 +249,7 @@ public final class MainActivity extends Activity {
         visible.sort(Comparator.comparing((Models.Ride r) -> !store.favourite(r.id()))
                 .thenComparingDouble(r -> distance(r) == null ? Double.POSITIVE_INFINITY : distance(r)).thenComparing(Models.Ride::name));
         if (visible.isEmpty() && !loading) content.addView(note(page.equals("My alerts")
-                ? "Choose Set alert on a ride to create your first rule." : page.equals("Favourites")
+                ? "Go to Nearby and choose Set alert on a ride to create your first rule." : page.equals("Favourites")
                 ? "Favourite a ride from Nearby to keep it here." : "No rides loaded for this park yet. Tap Refresh to try again."));
         if (page.equals("Nearby") && MonitorService.latestLocation == null) content.addView(note("Start Park mode for nearby distances. You can set alerts first."));
         for (Models.Ride r : visible) rideCard(r);

@@ -87,16 +87,18 @@ public final class MonitorService extends Service implements LocationListener {
         try {
             ParkApi.Snapshot snapshot = new ParkApi(this).load(monitoredPark);
             if (!active) return;
-            if (snapshot.cached()) { status = snapshot.message(); return; }
+            if (snapshot.cached()) { status = snapshot.message(); updateSessionNotification(); return; }
             failures = 0;
             android.location.Location location = latestLocation;
-            if (location == null) { status = "Waiting for a fresh location"; return; }
+            if (location == null) { status = "Waiting for a fresh location"; updateSessionNotification(); return; }
             long age = (SystemClock.elapsedRealtimeNanos() - location.getElapsedRealtimeNanos()) / 1_000_000;
-            long now = System.currentTimeMillis(); int watched = 0;
+            long now = System.currentTimeMillis(); int watched = 0, stale = 0;
             for (Models.Ride ride : snapshot.rides()) {
                 AlertEngine.Rule rule = store.rule(ride.id());
                 if (rule == null) continue;
                 watched++;
+                if (ride.updatedAt() <= 0 || now - ride.updatedAt() > AlertEngine.MAX_DATA_AGE_MS
+                        || ride.updatedAt() > now + 60_000L) stale++;
                 double distance = AlertEngine.distanceMetres(location.getLatitude(), location.getLongitude(), ride.latitude(), ride.longitude());
                 AlertEngine.Observation observation = new AlertEngine.Observation(ride.status(), ride.waitMinutes(), distance,
                         ride.updatedAt(), age, location.hasAccuracy() ? location.getAccuracy() : Float.POSITIVE_INFINITY);
@@ -105,8 +107,8 @@ public final class MonitorService extends Service implements LocationListener {
                 if (decision.shouldNotify() && active && notificationsAllowed(this)) {
                     Notification alert = new Notification.Builder(this, ALERT_CHANNEL)
                             .setSmallIcon(R.drawable.ic_ping).setContentTitle(ride.name())
-                            .setContentText(decision.reason() + " · " + (ride.waitMinutes() == null ? "Queue unavailable" : ride.waitMinutes() + " min queue")
-                                    + " · " + Math.round(distance) + " m away")
+                            .setContentText(decision.reason() + " · " + (ride.waitMinutes() == null ? "Posted wait unavailable" : ride.waitMinutes() + " min posted wait")
+                                    + " · about " + Math.round(distance) + " m in a straight line")
                             .setContentIntent(openApp()).setAutoCancel(true).build();
                     getSystemService(NotificationManager.class).notify(ride.id().hashCode(), alert);
                     store.ping(ride.id(), now);
@@ -117,16 +119,23 @@ public final class MonitorService extends Service implements LocationListener {
                     previousStatus.put(ride.id(), ride.status());
             }
             status = age > AlertEngine.MAX_LOCATION_AGE_MS ? "Location is stale — alerts paused"
-                    : location.getAccuracy() > 100 ? "Location too approximate — alerts paused" : "Watching " + watched + " rides · checked just now";
-            getSystemService(NotificationManager.class).notify(1, sessionNotification(status));
+                    : !location.hasAccuracy() || location.getAccuracy() > 100 ? "Location too approximate — alerts paused"
+                    : stale == 0 ? "Watching " + watched + " rides · checked just now"
+                    : stale == watched ? "Wait estimates are stale — alerts paused"
+                    : "Some wait estimates are stale — alerts paused for those rides";
+            updateSessionNotification();
         } catch (Exception e) {
             failures++; status = "Park feed unavailable — retrying; alerts paused";
+            updateSessionNotification();
             // A bounded extra delay backs off repeated network failures; interrupted on stop.
             if (failures > 1) {
                 try { Thread.sleep(Math.min(600_000L, failures * 60_000L)); }
                 catch (InterruptedException interrupted) { Thread.currentThread().interrupt(); }
             }
         }
+    }
+    private void updateSessionNotification() {
+        getSystemService(NotificationManager.class).notify(1, sessionNotification(status));
     }
     @Override public void onLocationChanged(android.location.Location location) { latestLocation = new android.location.Location(location); }
     @Override public void onProviderEnabled(String provider) { }
