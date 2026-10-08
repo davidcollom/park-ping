@@ -118,7 +118,8 @@ public final class MonitorService extends Service implements LocationListener {
                 if (ride.updatedAt() > 0 && now - ride.updatedAt() <= AlertEngine.MAX_DATA_AGE_MS)
                     previousStatus.put(ride.id(), ride.status());
             }
-            status = age > AlertEngine.MAX_LOCATION_AGE_MS ? "Location is stale — alerts paused"
+            status = watched == 0 ? "No ride alerts are set — Park mode idle"
+                    : age > AlertEngine.MAX_LOCATION_AGE_MS ? "Location is stale — alerts paused"
                     : !location.hasAccuracy() || location.getAccuracy() > 100 ? "Location too approximate — alerts paused"
                     : stale == 0 ? "Watching " + watched + " rides · checked just now"
                     : stale == watched ? "Wait estimates are stale — alerts paused"
