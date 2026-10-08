@@ -16,13 +16,17 @@ Save an alert for a ride with a maximum posted wait and straight-line distance, 
 
 Favourite rides separately, mark rides you’ve already done today, and set a cooldown as the minimum delay between alerts. Cooldown does not guarantee repeat notifications: a ride that stays eligible will not trigger repeated threshold alerts. Pause or stop Park mode whenever you like.
 
-The app currently supports Magic Kingdom, EPCOT, Hollywood Studios and Animal Kingdom; Disneyland Paris and Disney Adventure World; and Universal Studios Florida, Islands of Adventure and Epic Universe. Live ride data is supplied by ThemeParks.wiki; availability depends on its coverage.
+The app currently supports Magic Kingdom, EPCOT, Hollywood Studios and Animal Kingdom; Disneyland Paris and Disney Adventure World; and Universal Studios Florida, Islands of Adventure and Epic Universe. Live ride data is supplied by ThemeParks.wiki (https://www.themeparks.wiki); availability depends on its coverage.
 
 Your location is used on your device to calculate ride distances; your coordinates are not sent to the data provider. Starting Park mode requires location permission and notifications. Network requests expose normal network information, such as your IP address.
 
 Wait times are posted estimates, not guarantees, and may change before you arrive. Distances are straight-line, not walking routes. Alert delivery depends on fresh provider data, permissions, location accuracy, network availability and Android power settings.
 
 Park Ping is an independent app. It is not affiliated with Disney, Universal or ThemeParks.wiki.
+
+Support: https://github.com/davidcollom/park-ping/issues/new/choose. Reports are public; do not include secrets or precise location history.
+
+Privacy policy publication and Play declarations remain outstanding (issue #5); the draft is in docs/privacy-policy.html.
 
 ## Listing limits and assets
 
@@ -43,6 +47,6 @@ These are general published limits, not a check of this app’s Play Console lis
 - Review and approve the candidate mascot identity with Dave before publication (issue #1). The Play icon and feature graphic are exported in `docs/store-assets/`; editable SVG layouts are in `docs/brand/`.
 - Confirm the 512 × 512 app icon and 1024 × 500 feature graphic against current Play Console requirements when uploading.
 - Add the actual support contact and published privacy-policy URL (issues #5 and #10), and complete compatibility, signed AAB and Play testing work (issues #3, #4, #6 and #9).
-- Recheck the copy against release behavior, supported parks and the current Console limits.
+- Recheck the copy against release behaviour, supported parks and the current Console limits.
 
 See [the launch tracker](https://github.com/davidcollom/park-ping/issues/11). No Play listing has been published.

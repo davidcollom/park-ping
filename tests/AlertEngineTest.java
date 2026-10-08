@@ -43,6 +43,15 @@ public final class AlertEngineTest {
         check(!evaluate(observation("OPERATING", 0, 300, NOW + 61_000, 0, 10), false, false, null, 0).shouldNotify(), "Future feed timestamp rejected");
         check(!evaluate(observation("OPERATING", 0, 300, NOW, -1, 10), false, false, null, 0).shouldNotify(), "Invalid location age");
         check(!evaluate(observation("OPERATING", 0, 300, NOW, 0, Float.NaN), false, false, null, 0).shouldNotify(), "Invalid accuracy");
+        check(AlertEngine.isFreshData(NOW - 600_000, NOW), "Ten-minute boundary remains fresh");
+        check(!AlertEngine.isFreshData(NOW - 600_001, NOW), "One millisecond beyond cutoff is stale");
+        check(AlertEngine.isFreshData(NOW + 60_000, NOW), "One-minute future allowance is inclusive");
+        String remembered = AlertEngine.statusForHistory(null, "DOWN", NOW + 60_001, NOW);
+        check(remembered == null, "Future DOWN never seeds reopening history");
+        check(!evaluate(observation("OPERATING", 60, 300, NOW, 0, 10), false, false, remembered, 0).shouldNotify(),
+                "Valid operating data after future DOWN cannot falsely reopen");
+        check("OPERATING".equals(AlertEngine.statusForHistory("OPERATING", "DOWN", NOW - 600_001, NOW)),
+                "Stale DOWN does not replace valid history");
         var disabledReopen = new AlertEngine.Rule(20, 750, true, false, 30);
         check(!AlertEngine.evaluate(disabledReopen, observation("OPERATING", 60, 300, NOW, 0, 10),
                 false, false, "DOWN", 0, NOW).shouldNotify(), "Reopening toggle honoured");

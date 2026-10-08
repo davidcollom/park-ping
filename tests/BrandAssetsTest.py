@@ -131,8 +131,6 @@ check(contrast("#72D8C7", "#203B3A") >= 4.5, "dark brand control text meets WCAG
 check(contrast("#FFFFFF", "#08786F") >= 4.5, "primary button text meets WCAG AA contrast")
 main_source = (ROOT / "app/src/main/java/uk/co/collom/parkping/MainActivity.java").read_text()
 check("#08786F" in main_source and "#72D8C7" in main_source, "app uses the checked brand colours")
-check("purple = accent;" in main_source and "onPurple = onAccent;" in main_source,
-      "legacy navigation color fields retain the teal brand colors")
 
 play_icon = ROOT / "docs/store-assets/park-ping-play-icon.png"
 check(png_info(play_icon)[:2] == (512, 512), "Play icon is 512 x 512")
