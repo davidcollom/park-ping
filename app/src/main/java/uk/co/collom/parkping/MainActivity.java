@@ -25,13 +25,14 @@ public final class MainActivity extends Activity {
     private LinearLayout screen, content;
     private TextView feedStatus, sessionStatus;
     private Button sessionButton;
+    private final Map<String, Button> navigationButtons = new LinkedHashMap<>();
     private List<Models.Ride> rides = new ArrayList<>();
     private boolean loading;
     private boolean cached;
     private String page = "Nearby";
     private int generation;
     private long refreshed;
-    private int background, ink, muted, card, line, accent, onAccent, purple, onPurple, soft;
+    private int background, ink, muted, card, line, accent, onAccent, soft;
     private final Runnable ticker = new Runnable() {
         @Override public void run() {
             updateSession();
@@ -56,8 +57,6 @@ public final class MainActivity extends Activity {
         line = Color.parseColor(dark ? "#353D53" : "#E1E2ED");
         accent = Color.parseColor(dark ? "#72D8C7" : "#08786F");
         onAccent = Color.parseColor(dark ? "#102E2B" : "#FFFFFF");
-        purple = accent;
-        onPurple = onAccent;
         soft = Color.parseColor(dark ? "#203B3A" : "#E3F5F0");
     }
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
@@ -87,52 +86,71 @@ public final class MainActivity extends Activity {
         screen = vertical(); screen.setBackgroundColor(background); screen.setPadding(dp(18), dp(8), dp(18), 0);
         screen.setOnApplyWindowInsetsListener((v, insets) -> {
             if (Build.VERSION.SDK_INT >= 30) {
-                android.graphics.Insets bars = insets.getInsets(
-                        WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+                android.graphics.Insets bars = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
                 v.setPadding(dp(18) + bars.left, dp(8) + bars.top, dp(18) + bars.right, bars.bottom);
             } else v.setPadding(dp(18), dp(8) + insets.getSystemWindowInsetTop(), dp(18), insets.getSystemWindowInsetBottom());
             return insets;
         });
         setContentView(screen);
+        ScrollView scroll = new ScrollView(this); LinearLayout body = vertical(); scroll.addView(body);
+        screen.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
         LinearLayout brand = horizontal();
         ImageView mascot = new ImageView(this); mascot.setImageResource(R.drawable.park_ping_mascot);
-        mascot.setContentDescription("Park Ping smiling location-pin mascot");
+        mascot.setContentDescription(null);
+        mascot.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
         mascot.setScaleType(ImageView.ScaleType.FIT_CENTER);
         brand.addView(mascot, new LinearLayout.LayoutParams(dp(64), dp(64)));
         LinearLayout wordmark = vertical(); wordmark.setPadding(dp(10), 0, 0, 0);
         wordmark.addView(text("Park Ping", 28, true));
         wordmark.addView(note("A shorter queue. Just around the corner."));
         brand.addView(wordmark, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
-        screen.addView(brand); addGap(screen, 8);
+        body.addView(brand); addGap(body, 8);
+        body.addView(note("Choose a park, save a ride alert, then start Park mode. Stop monitoring any time."));
+        body.addView(button("Help or report a problem ↗", () -> {
+            try { startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://github.com/davidcollom/park-ping/issues/new/choose"))); }
+            catch (ActivityNotFoundException e) { message("Open github.com/davidcollom/park-ping/issues/new/choose in a browser for help."); }
+        }, false));
+        addGap(body, 8);
+        TextView parkLabel = note("Park to monitor");
         Spinner parks = new Spinner(this);
         ArrayAdapter<Models.Park> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Models.PARKS);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); parks.setAdapter(adapter); parks.setSelection(store.parkIndex());
-        screen.addView(parks, new LinearLayout.LayoutParams(-1, dp(48)));
+        parks.setId(View.generateViewId());
+        parkLabel.setLabelFor(parks.getId()); body.addView(parkLabel);
+        parks.setMinimumHeight(dp(48)); body.addView(parks, new LinearLayout.LayoutParams(-1, ViewGroup.LayoutParams.WRAP_CONTENT));
         parks.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override public void onNothingSelected(AdapterView<?> p) { }
             @Override public void onItemSelected(AdapterView<?> p, View v, int position, long id) {
                 if (position == store.parkIndex()) return;
+                boolean wasActive = MonitorService.active;
                 stopService(new Intent(MainActivity.this, MonitorService.class));
                 store.setPark(position); generation++; rides = new ArrayList<>(); refreshed = 0; loading = false;
                 render(); refresh(); updateSession();
+                if (wasActive) message("Park changed. Park mode stopped; start it again to monitor this park.");
             }
         });
         LinearLayout session = vertical(); session.setPadding(dp(12), dp(10), dp(12), dp(10)); session.setBackground(surface(soft, 16, false));
         sessionStatus = text("Park mode is off", 14, true); session.addView(sessionStatus);
-        session.addView(note("Location stays on your phone. Stop whenever you like."));
-        sessionButton = button("Start Park mode", this::toggleSession, false); session.addView(sessionButton); screen.addView(session);
-        ScrollView scroll = new ScrollView(this); content = vertical(); scroll.addView(content);
-        screen.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        session.addView(note("Park mode checks your location and posted wait estimates about every two minutes. Your location stays on this phone."));
+        sessionButton = button("Start Park mode", this::toggleSession, false); session.addView(sessionButton); body.addView(session);
+        sessionStatus.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+        content = vertical(); body.addView(content);
         LinearLayout navigation = horizontal();
         for (String tab : java.util.Arrays.asList("Nearby", "Favourites", "My alerts")) {
-            weighted(navigation, button(tab, () -> { page = tab; render(); }, false));
+            Button tabButton = button(tab, () -> { page = tab; render(); }, page.equals(tab));
+            navigationButtons.put(tab, tabButton); weighted(navigation, tabButton);
         }
         screen.addView(navigation); updateSession();
     }
     private void updateSession() {
         if (sessionStatus == null) return;
-        sessionButton.setText(MonitorService.active ? "Pause Park mode" : "Start Park mode");
-        sessionStatus.setText(MonitorService.active ? MonitorService.status : "Park mode is off");
+        sessionButton.setText(MonitorService.active ? "Stop Park mode" : "Start Park mode");
+        String nextStatus = MonitorService.active ? MonitorService.status : "Park mode is off";
+        if (!nextStatus.contentEquals(sessionStatus.getText())) sessionStatus.setText(nextStatus);
+        String description = "Park mode status: " + nextStatus;
+        if (!description.contentEquals(sessionStatus.getContentDescription() == null ? "" : sessionStatus.getContentDescription()))
+            sessionStatus.setContentDescription(description);
     }
     private void toggleSession() {
         if (MonitorService.active) { stopService(new Intent(this, MonitorService.class)); main.postDelayed(this::updateSession, 200); return; }
@@ -157,7 +175,7 @@ public final class MainActivity extends Activity {
         }
         if (!MonitorService.notificationsAllowed(this)) {
             new AlertDialog.Builder(this).setTitle("Notifications are switched off")
-                    .setMessage("Enable Park Ping’s ride alerts in Android settings before starting Park mode.")
+                    .setMessage("Enable Park Ping’s Park mode and ride alert notifications in Android settings before starting Park mode.")
                     .setNegativeButton("Later", null).setPositiveButton("Settings", (d,w) -> startActivity(
                             new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName()))).show(); return;
         }
@@ -171,7 +189,18 @@ public final class MainActivity extends Activity {
     }
     @Override public void onRequestPermissionsResult(int code, String[] permissions, int[] results) {
         super.onRequestPermissionsResult(code, permissions, results);
-        if (code == 10) startSession();
+        if (code == 10) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                new AlertDialog.Builder(this).setTitle("Location permission is off")
+                        .setMessage("Park mode needs location access to work out how far you are from a ride. You can still browse without it.")
+                        .setNegativeButton("Not now", null).setPositiveButton("Open app settings", (d, w) -> startActivity(
+                                new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                        Uri.parse("package:" + getPackageName())))).show();
+                return;
+            }
+            startSession();
+        }
         if (code == 11) sendTestNotification();
     }
     private void requestTestNotification() {
@@ -185,8 +214,8 @@ public final class MainActivity extends Activity {
         PendingIntent open = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         getSystemService(NotificationManager.class).notify(100,
                 new Notification.Builder(this, MonitorService.ALERT_CHANNEL).setSmallIcon(R.drawable.ic_notification)
-                        .setContentTitle("Park Ping · Test notification")
-                        .setContentText("Example only: a favourite ride has a 15 min queue, 250 m away.")
+                        .setContentTitle("Park Ping · Sample test notification")
+                        .setContentText("SAMPLE ONLY: a favourite ride has a 15 min posted wait, 250 m away.")
                         .setContentIntent(open).setAutoCancel(true).build());
         message("Test notification sent — this is sample data.");
     }
@@ -213,10 +242,12 @@ public final class MainActivity extends Activity {
         });
     }
     private String age(Models.Ride r) {
-        if (r.updatedAt() <= 0) return "Update time unavailable";
-        long minutes = Math.max(0, (System.currentTimeMillis() - r.updatedAt()) / 60_000);
-        return "Updated " + (minutes < 1 ? "just now" : minutes + " min ago")
-                + (minutes > 10 ? " · stale, no alerts" : "") + (cached ? " · cached" : "");
+        if (r.updatedAt() <= 0) return "Update time unavailable · no alerts";
+        long now = System.currentTimeMillis();
+        boolean fresh = AlertEngine.isFreshData(r.updatedAt(), now);
+        long minutes = Math.max(0, (now - r.updatedAt()) / 60_000);
+        return (!fresh ? "STALE — " : "") + "Updated " + (minutes < 1 ? "just now" : minutes + " min ago")
+                + (!fresh ? " · alerts paused" : "") + (cached ? " · offline copy" : "");
     }
     private Double distance(Models.Ride r) {
         android.location.Location l = MonitorService.latestLocation;
@@ -225,10 +256,13 @@ public final class MainActivity extends Activity {
         return Double.isFinite(d) ? d : null;
     }
     private void render() {
-        if (content == null) return; content.removeAllViews(); addGap(content, 12);
+        if (content == null) return; content.removeAllViews(); updateNavigation(); addGap(content, 12);
         content.addView(text(page.equals("Nearby") ? "Near you" : page.equals("Favourites") ? "Your favourites" : "My alerts", 21, true));
         feedStatus = note(loading ? "Loading live park data…" : "Data from ThemeParks.wiki · Posted waits may change"); content.addView(feedStatus);
+        feedStatus.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         Button refresh = button(loading ? "Refreshing…" : "Refresh", this::refresh, false); refresh.setEnabled(!loading); content.addView(refresh);
+        content.addView(button("Powered by ThemeParks.wiki", () -> openExternalUrl("https://www.themeparks.wiki"), false));
+        content.addView(note("Unofficial app, not affiliated with Disney or Universal."));
         List<Models.Ride> visible = new ArrayList<>();
         for (Models.Ride r : rides) {
             if (page.equals("Favourites") && !store.favourite(r.id())) continue;
@@ -248,18 +282,21 @@ public final class MainActivity extends Activity {
         if (page.equals("Nearby") && MonitorService.latestLocation == null) content.addView(note("Start Park mode for nearby distances. You can set alerts first."));
         for (Models.Ride r : visible) rideCard(r);
         addGap(content, 16);
-        TextView attribution = note("Data: ThemeParks.wiki ↗ · Unofficial app, not affiliated with Disney or Universal.");
-        attribution.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://themeparks.wiki")))); content.addView(attribution);
+
+    }
+    private void openExternalUrl(String url) {
+        try { startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url))); }
+        catch (ActivityNotFoundException e) { message("Open " + url + " in a browser."); }
     }
     private void rideCard(Models.Ride r) {
         addGap(content, 12); LinearLayout c = vertical(); c.setPadding(dp(14), dp(14), dp(14), dp(14)); c.setBackground(surface(card, 18, true));
         c.addView(text(r.name(), 17, true));
-        String wait = "OPERATING".equals(r.status()) ? (r.waitMinutes() == null ? "Queue unavailable" : r.waitMinutes() + " min queue") : r.status().toLowerCase(Locale.UK);
+        String wait = "OPERATING".equals(r.status()) ? (r.waitMinutes() == null ? "Posted wait unavailable" : r.waitMinutes() + " min posted wait") : r.status().toLowerCase(Locale.UK);
         Double distance = distance(r);
-        c.addView(text(wait + (distance == null ? "" : " · " + Math.round(distance) + " m away"), 16, true)); c.addView(note(age(r)));
+        c.addView(text(wait + (distance == null ? "" : " · about " + Math.round(distance) + " m in a straight line"), 16, true)); c.addView(note(age(r)));
         if (store.ridden(r.id())) c.addView(note("✓ Ridden today"));
         AlertEngine.Rule q = store.rule(r.id());
-        if (q != null) c.addView(note("Alert: queue ≤ " + q.maxWaitMinutes() + " min · Within " + q.radiusMetres() + " m"));
+        if (q != null) c.addView(note("Alert: posted wait ≤ " + q.maxWaitMinutes() + " min and within " + q.radiusMetres() + " m in a straight line"));
         LinearLayout actions = horizontal();
         weighted(actions, button(store.favourite(r.id()) ? "♥ Saved" : "♡ Favourite", () -> { store.favourite(r.id(), !store.favourite(r.id())); render(); }, false));
         weighted(actions, button(q == null ? "Set alert" : "Edit alert", () -> edit(r), false)); c.addView(actions);
@@ -281,15 +318,16 @@ public final class MainActivity extends Activity {
         AlertEngine.Rule saved = store.rule(r.id());
         AlertEngine.Rule q = saved == null ? new AlertEngine.Rule(20, 750, true, true, 30) : saved;
         ScrollView scroll = new ScrollView(this); LinearLayout fields = vertical(); fields.setPadding(dp(20), dp(8), dp(20), dp(12)); scroll.addView(fields);
-        SeekBar wait = slider(fields, "Maximum queue", q.maxWaitMinutes(), 0, 90, 5, " min");
-        SeekBar radius = slider(fields, "Within this distance", q.radiusMetres(), 100, 2000, 50, " m");
+        fields.addView(note("The wait is the park's posted estimate, not a guarantee of how long you will wait."));
+        SeekBar wait = slider(fields, "Maximum posted wait", q.maxWaitMinutes(), 0, 90, 5, " min");
+        SeekBar radius = slider(fields, "Straight-line radius", q.radiusMetres(), 100, 2000, 50, " m");
         Switch skip = new Switch(this); skip.setText("Only if I haven’t ridden it today"); skip.setChecked(q.skipRidden()); skip.setMinHeight(dp(56)); fields.addView(skip);
         Switch reopen = new Switch(this); reopen.setText("Also alert when it reopens nearby"); reopen.setChecked(q.notifyReopening()); reopen.setMinHeight(dp(56)); fields.addView(reopen);
-        fields.addView(button("Send test notification", this::requestTestNotification, false));
+        fields.addView(button("Send sample test notification", this::requestTestNotification, false));
         fields.addView(note("Time between alerts")); Spinner cooldown = new Spinner(this);
         cooldown.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, java.util.Arrays.asList("15 minutes", "30 minutes", "1 hour")));
         cooldown.setSelection(q.cooldownMinutes() == 15 ? 0 : q.cooldownMinutes() == 60 ? 2 : 1); fields.addView(cooldown);
-        fields.addView(note("Distance is straight-line, not walking time. Reopening alerts respect distance, ridden status and cooldown; they can trigger above your queue limit."));
+        fields.addView(note("Distance is a straight line, not a walking route or travel time. Reopening alerts still respect distance, ridden status and cooldown, but can trigger above your wait limit."));
         new AlertDialog.Builder(this).setTitle(r.name()).setView(scroll).setNegativeButton("Cancel", null)
                 .setNeutralButton(saved == null ? "" : "Remove", (dialog, which) -> { store.removeRule(r.id()); render(); })
                 .setPositiveButton("Save alert", (dialog, which) -> {
@@ -301,14 +339,36 @@ public final class MainActivity extends Activity {
     private SeekBar slider(LinearLayout fields, String title, int value, int minimum, int maximum, int step, String unit) {
         TextView label = text(title + ": " + value + unit, 15, true); fields.addView(label);
         SeekBar bar = new SeekBar(this); bar.setMax((maximum - minimum) / step); bar.setProgress((value - minimum) / step);
+        bar.setContentDescription(title + ", " + value + unit);
         fields.addView(bar, new LinearLayout.LayoutParams(-1, dp(48)));
         bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override public void onProgressChanged(SeekBar b, int p, boolean user) { label.setText(title + ": " + (minimum + p * step) + unit); }
+            @Override public void onProgressChanged(SeekBar b, int p, boolean user) {
+                int selected = minimum + p * step; label.setText(title + ": " + selected + unit);
+                bar.setContentDescription(title + ", " + selected + unit);
+            }
             @Override public void onStartTrackingTouch(SeekBar b) { }
             @Override public void onStopTrackingTouch(SeekBar b) { }
         }); return bar;
     }
-    @Override protected void onResume() { super.onResume(); main.post(ticker); }
+    private void updateNavigation() {
+        for (Map.Entry<String, Button> entry : navigationButtons.entrySet()) {
+            boolean selected = page.equals(entry.getKey()); Button tab = entry.getValue();
+            tab.setSelected(selected); tab.setContentDescription(entry.getKey() + (selected ? ", current screen" : ""));
+            tab.setTextColor(selected ? onAccent : accent);
+            tab.setBackground(surface(selected ? accent : soft, 12, false));
+        }
+    }
+    @Override protected void onResume() {
+        super.onResume();
+        if (MonitorService.active
+                && ((checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                || !MonitorService.notificationsAllowed(this))) {
+            stopService(new Intent(this, MonitorService.class));
+            main.postDelayed(this::updateSession, 200);
+        }
+        main.post(ticker);
+    }
     @Override protected void onPause() { main.removeCallbacks(ticker); super.onPause(); }
     @Override protected void onDestroy() { generation++; network.shutdownNow(); main.removeCallbacksAndMessages(null); super.onDestroy(); }
 }

@@ -16,11 +16,16 @@ public final class AlertEngine {
                               long updatedAt, long locationAgeMs, float accuracyMetres) { }
     public record Decision(boolean matches, boolean shouldNotify, String reason) { }
     private AlertEngine() { }
+    public static boolean isFreshData(long updatedAt, long now) {
+        return updatedAt > 0 && now - updatedAt <= MAX_DATA_AGE_MS && updatedAt <= now + 60_000L;
+    }
+    public static String statusForHistory(String previous, String current, long updatedAt, long now) {
+        return isFreshData(updatedAt, now) ? current : previous;
+    }
     public static Decision evaluate(Rule rule, Observation observation, boolean ridden,
                                     boolean previouslyMatched, String previousStatus,
                                     long lastNotificationAt, long now) {
-        if (observation.updatedAt <= 0 || now - observation.updatedAt > MAX_DATA_AGE_MS
-                || observation.updatedAt > now + 60_000L) return no("Queue data is stale or unavailable");
+        if (!isFreshData(observation.updatedAt, now)) return no("Queue data is stale or unavailable");
         if (observation.locationAgeMs < 0 || observation.locationAgeMs > MAX_LOCATION_AGE_MS
                 || !Float.isFinite(observation.accuracyMetres) || observation.accuracyMetres > 100
                 || observation.accuracyMetres < 0) return no("Waiting for a fresh, accurate location");
