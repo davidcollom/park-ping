@@ -92,16 +92,23 @@ public final class MainActivity extends Activity {
             return insets;
         });
         setContentView(screen);
-        screen.addView(text("Park Ping", 28, true));
-        screen.addView(note("Choose a park, save a ride alert, then start Park mode. Stop monitoring any time."));
-        addGap(screen, 8);
+        ScrollView scroll = new ScrollView(this); LinearLayout body = vertical(); scroll.addView(body);
+        screen.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        body.addView(text("Park Ping", 28, true));
+        body.addView(note("Choose a park, save a ride alert, then start Park mode. Stop monitoring any time."));
+        body.addView(button("Help or report a problem ↗", () -> {
+            try { startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("https://github.com/davidcollom/park-ping/issues/new/choose"))); }
+            catch (ActivityNotFoundException e) { message("Open github.com/davidcollom/park-ping/issues/new/choose in a browser for help."); }
+        }, false));
+        addGap(body, 8);
         TextView parkLabel = note("Park to monitor");
         Spinner parks = new Spinner(this);
         ArrayAdapter<Models.Park> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Models.PARKS);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); parks.setAdapter(adapter); parks.setSelection(store.parkIndex());
         parks.setId(View.generateViewId());
-        parkLabel.setLabelFor(parks.getId()); screen.addView(parkLabel);
-        parks.setMinimumHeight(dp(48)); screen.addView(parks, new LinearLayout.LayoutParams(-1, ViewGroup.LayoutParams.WRAP_CONTENT));
+        parkLabel.setLabelFor(parks.getId()); body.addView(parkLabel);
+        parks.setMinimumHeight(dp(48)); body.addView(parks, new LinearLayout.LayoutParams(-1, ViewGroup.LayoutParams.WRAP_CONTENT));
         parks.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override public void onNothingSelected(AdapterView<?> p) { }
             @Override public void onItemSelected(AdapterView<?> p, View v, int position, long id) {
@@ -116,10 +123,9 @@ public final class MainActivity extends Activity {
         LinearLayout session = vertical(); session.setPadding(dp(12), dp(10), dp(12), dp(10)); session.setBackground(surface(soft, 16, false));
         sessionStatus = text("Park mode is off", 14, true); session.addView(sessionStatus);
         session.addView(note("Park mode checks your location and posted wait estimates about every two minutes. Your location stays on this phone."));
-        sessionButton = button("Start Park mode", this::toggleSession, false); session.addView(sessionButton); screen.addView(session);
+        sessionButton = button("Start Park mode", this::toggleSession, false); session.addView(sessionButton); body.addView(session);
         sessionStatus.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
-        ScrollView scroll = new ScrollView(this); content = vertical(); scroll.addView(content);
-        screen.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        content = vertical(); body.addView(content);
         LinearLayout navigation = horizontal();
         for (String tab : java.util.Arrays.asList("Nearby", "Favourites", "My alerts")) {
             Button tabButton = button(tab, () -> { page = tab; render(); }, page.equals(tab));
