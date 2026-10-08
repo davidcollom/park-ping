@@ -18,13 +18,13 @@ Park Ping helps you keep an eye on your favourite rides while you enjoy your par
 
 Save favourites, mark rides you’ve already done today and choose how long to wait between pings. You can also enable alerts when a nearby ride reopens after temporary downtime.
 
-The first version supports selected Disney and Universal parks in Orlando and Disneyland Paris. Live ride data comes from ThemeParks.wiki, and availability depends on its coverage.
+The first version supports selected Disney and Universal parks in Orlando and Disneyland Paris. Live ride data is **Powered by [ThemeParks.wiki](https://themeparks.wiki)**, and availability depends on its coverage.
 
 Your location is processed on your phone to calculate ride distances. Coordinates are not sent to the park-data provider. Park mode is started by you and can be paused or stopped from the app or its ongoing notification. Network requests still expose normal network information such as your IP address; the provider may observe or log request metadata, and its logging and retention practices have not been independently verified here.
 
 Queue times are posted estimates and can change. Distance is a straight-line radius, not a walking route. Notifications need fresh data, location access and notification permission; Android battery settings can affect delivery.
 
-Live data is [powered by ThemeParks.wiki](https://www.themeparks.wiki/terms). Park Ping is an independent app and is not affiliated with Disney, Universal or ThemeParks.wiki.
+Live data is **Powered by [ThemeParks.wiki](https://themeparks.wiki)**. Park Ping is an independent app and is not affiliated with Disney, Universal or ThemeParks.wiki.
 
 ## Before this goes live
 

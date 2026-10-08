@@ -216,7 +216,9 @@ public final class MainActivity extends Activity {
     private void render() {
         if (content == null) return; content.removeAllViews(); addGap(content, 12);
         content.addView(text(page.equals("Nearby") ? "Near you" : page.equals("Favourites") ? "Your favourites" : "My alerts", 21, true));
-        feedStatus = note(loading ? "Loading live park data…" : "Data from ThemeParks.wiki · Posted waits may change"); content.addView(feedStatus);
+        feedStatus = note(loading ? "Loading live park data…" : "Posted waits may change"); content.addView(feedStatus);
+        TextView attribution = note("Powered by ThemeParks.wiki ↗ · Independent, unofficial app; not affiliated with Disney, Universal or ThemeParks.wiki.");
+        attribution.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://themeparks.wiki")))); content.addView(attribution);
         Button refresh = button(loading ? "Refreshing…" : "Refresh", this::refresh, false); refresh.setEnabled(!loading); content.addView(refresh);
         List<Models.Ride> visible = new ArrayList<>();
         for (Models.Ride r : rides) {
@@ -232,8 +234,6 @@ public final class MainActivity extends Activity {
         if (page.equals("Nearby") && MonitorService.latestLocation == null) content.addView(note("Start Park mode for nearby distances. You can set alerts first."));
         for (Models.Ride r : visible) rideCard(r);
         addGap(content, 16);
-        TextView attribution = note("Powered by ThemeParks.wiki ↗ · Independent, unofficial app; not affiliated with Disney, Universal or ThemeParks.wiki.");
-        attribution.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themeparks.wiki/terms")))); content.addView(attribution);
     }
     private void rideCard(Models.Ride r) {
         addGap(content, 12); LinearLayout c = vertical(); c.setPadding(dp(14), dp(14), dp(14), dp(14)); c.setBackground(surface(card, 18, true));
