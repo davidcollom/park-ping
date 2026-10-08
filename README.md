@@ -59,6 +59,8 @@ Park Ping uses your location on your device to calculate ride distances. It does
 
 Live data requests use park IDs and expose normal network information such as your IP address. Monitoring starts when you switch on Park mode, with an ongoing notification and a stop control. Android battery settings may delay checks or stop monitoring.
 
+[Privacy policy](https://github.com/davidcollom/park-ping/blob/main/docs/privacy-policy.html) · [Support and privacy questions](https://github.com/davidcollom/park-ping/issues/new)
+
 ## Help shape the first release
 
 Found a problem? [Open an issue](https://github.com/davidcollom/park-ping/issues/new) with your app version, Android version, selected park and what happened. Please keep passwords and signing keys private.

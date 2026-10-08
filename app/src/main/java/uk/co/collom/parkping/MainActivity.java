@@ -19,6 +19,7 @@ import java.util.concurrent.*;
 
 /** Native Android UI for the approved phone prototype. */
 public final class MainActivity extends Activity {
+    private static final String PRIVACY_POLICY_URL = "https://github.com/davidcollom/park-ping/blob/main/docs/privacy-policy.html";
     private final ExecutorService network = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
     private Store store;
@@ -120,7 +121,7 @@ public final class MainActivity extends Activity {
     }
     private void updateSession() {
         if (sessionStatus == null) return;
-        sessionButton.setText(MonitorService.active ? "Pause Park mode" : "Start Park mode");
+        sessionButton.setText(MonitorService.active ? "Stop Park mode" : "Start Park mode");
         sessionStatus.setText(MonitorService.active ? MonitorService.status : "Park mode is off");
     }
     private void toggleSession() {
@@ -234,6 +235,7 @@ public final class MainActivity extends Activity {
         addGap(content, 16);
         TextView attribution = note("Data: ThemeParks.wiki ↗ · Unofficial app, not affiliated with Disney or Universal.");
         attribution.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://themeparks.wiki")))); content.addView(attribution);
+        content.addView(button("Privacy policy", () -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))), false));
     }
     private void rideCard(Models.Ride r) {
         addGap(content, 12); LinearLayout c = vertical(); c.setPadding(dp(14), dp(14), dp(14), dp(14)); c.setBackground(surface(card, 18, true));
@@ -281,7 +283,17 @@ public final class MainActivity extends Activity {
             @Override public void onStopTrackingTouch(SeekBar b) { }
         }); return bar;
     }
-    @Override protected void onResume() { super.onResume(); main.post(ticker); }
+    @Override protected void onResume() {
+        super.onResume();
+        if (MonitorService.active
+                && ((checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                || !MonitorService.notificationsAllowed(this))) {
+            stopService(new Intent(this, MonitorService.class));
+            main.postDelayed(this::updateSession, 200);
+        }
+        main.post(ticker);
+    }
     @Override protected void onPause() { main.removeCallbacks(ticker); super.onPause(); }
     @Override protected void onDestroy() { generation++; network.shutdownNow(); main.removeCallbacksAndMessages(null); super.onDestroy(); }
 }

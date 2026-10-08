@@ -81,6 +81,12 @@ public final class MonitorService extends Service implements LocationListener {
     }
     private void poll() {
         if (!active) return;
+        if ((checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                || !notificationsAllowed(this)) {
+            status = "Park mode stopped because a required permission is unavailable";
+            stopSelf(); return;
+        }
         if (SystemClock.elapsedRealtime() - started >= 12 * 60 * 60_000L) {
             status = "12-hour Park mode session ended"; main.post(this::stopSelf); return;
         }
