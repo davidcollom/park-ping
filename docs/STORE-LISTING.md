@@ -12,9 +12,9 @@ Nearby ride alerts for your park day. Set queue and distance limits.
 
 ## Full description
 
-Keep an eye on nearby rides you’ve favourited during your park day. Choose a maximum posted wait and straight-line distance, then start Park mode. Park Ping can notify you when fresh ride data meets your conditions, or when a nearby ride reopens after temporary downtime.
+Save an alert for a ride with a maximum posted wait and straight-line distance, then start Park mode. Park Ping can notify you when fresh ride data meets that ride’s alert conditions, or when a nearby ride reopens after temporary downtime.
 
-Save favourites, mark rides you’ve already done today, and choose how long to wait between repeat alerts. Pause or stop Park mode whenever you like.
+Favourite rides separately, mark rides you’ve already done today, and set a cooldown as the minimum delay between alerts. Cooldown does not guarantee repeat notifications: a ride that stays eligible will not trigger repeated threshold alerts. Pause or stop Park mode whenever you like.
 
 The app currently supports Magic Kingdom, EPCOT, Hollywood Studios and Animal Kingdom; Disneyland Paris and Disney Adventure World; and Universal Studios Florida, Islands of Adventure and Epic Universe. Live ride data is supplied by ThemeParks.wiki; availability depends on its coverage.
 
