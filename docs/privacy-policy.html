@@ -14,7 +14,7 @@
   <main>
     <h1>Park Ping privacy policy</h1>
     <p><strong>Effective date:</strong> 8 October 2026</p>
-    <p>Park Ping is an independent Android app developed by David Collom (GitHub: <a href="https://github.com/davidcollom">davidcollom</a>). This draft describes the app's current source behavior and the signed APK version 0.0.1.</p>
+    <p>Park Ping is an independent Android app developed by David Collom (GitHub: <a href="https://github.com/davidcollom">davidcollom</a>). This draft describes the current release-candidate source behaviour; verify it against the exact binary before publication.</p>
     <p><strong>Publication status:</strong> a public, rendered policy URL is not available yet. The app and store listing should link to that hosted page only after it is anonymously reachable without sign-in and matches the final release. This file remains a review draft until that public URL is ready.</p>
 
     <h2>Location</h2>
@@ -28,7 +28,7 @@
     <h2>Information stored on your device</h2>
     <ul>
       <li>App settings store your selected park, favourite ride IDs, alert rules, ride-date markers, and notification cooldown timestamps in Android app-private preferences.</li>
-      <li>Ride and queue responses are cached in the app's private cache for offline display. Park metadata is refreshed when older than 24 hours; live data is replaced after a successful refresh. Cache files can otherwise remain until replaced or cleared.</li>
+      <li>Public park metadata and queue responses are held in the app's private cache for up to five minutes of operational reuse. Expired files are discarded when next accessed; Android may also remove them. A recent successful response may be shared between browsing and monitoring in memory within that five-minute window. Disk or failed-request fallback cannot trigger alerts.</li>
     <li>These settings and cached feeds are not guaranteed to be excluded from all device-transfer or OEM backup mechanisms. The app disables Android cloud backup, but the app does not control every vendor-specific backup or migration rule. They remain on the device until you clear Park Ping's app data/cache or uninstall the app; alert settings can also be removed in the app.</li>
     </ul>
     <p>Park Ping does not keep a copy of this information on a developer-operated server. Android may remove cache files at any time.</p>

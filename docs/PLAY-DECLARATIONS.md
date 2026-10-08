@@ -1,6 +1,6 @@
 # Google Play privacy declarations — review worksheet
 
-Prepared from the Android source for the current signed APK, version 0.0.1. This is a review worksheet, not a completed Play Console submission. Recheck the shipped binary, the current Play Console questions, and ThemeParks.wiki's current privacy practices before submitting. The app does not yet have a published hosted privacy policy URL, and the provider/data-safety answers remain unresolved until the review is complete.
+Prepared from the current release-candidate Android source; verify the exact shipped binary before submission. This is a review worksheet, not a completed Play Console submission. Recheck the shipped binary, the current Play Console questions, and ThemeParks.wiki's current privacy practices before submitting. The app does not yet have a published hosted privacy policy URL, and the provider/data-safety answers remain unresolved until the review is complete.
 
 ## Data safety
 
@@ -8,9 +8,9 @@ Prepared from the Android source for the current signed APK, version 0.0.1. This
 | --- | --- |
 | Location | The app accesses approximate or precise device location only after permission is granted and the user starts Park mode. It is processed on-device to calculate ride distances and evaluate alerts; the app does not transmit or persist coordinates. Do not describe this as location collected by Park Ping based on the current code. |
 | Other data sent by the app | HTTPS requests to `api.themeparks.wiki` contain the selected park ID and request public ride/queue data. The API necessarily sees the connection's IP address and ordinary request metadata. The app does not operate a backend or send an account ID, advertising ID, alert rules, favourites, notification history, or coordinates. |
-| Third-party processing | Confirm ThemeParks.wiki's current privacy notice and whether/how it retains request logs, including IP addresses, before finalizing the Console's collection/sharing answers. Do not infer the provider's retention from Park Ping's code. If the provider's handling or Play's definitions require a data type to be declared, update the Console answers and policy accordingly. |
+| Third-party processing | Confirm ThemeParks.wiki's current privacy notice and whether/how it retains request logs, including IP addresses, before finalising the Console's collection/sharing answers. Do not infer the provider's retention from Park Ping's code. If the provider's handling or Play's definitions require a data type to be declared, update the Console answers and policy accordingly. |
 | SDKs and tracking | No analytics, advertising, account, or crash-reporting SDK is present in the app source/dependencies. No app-level tracking or account data is sent. |
-| On-device data and retention | Private preferences contain selected park, ride IDs for favourites and alert rules, ridden-date markers, and alert cooldown timestamps. Cached public feed JSON is stored in app cache. Settings persist until app data is cleared/uninstalled; cache is replaced on successful refresh or can be cleared by Android/the user. `allowBackup` is false. |
+| On-device data and retention | Private preferences contain selected park, ride IDs for favourites and alert rules, ridden-date markers, and alert cooldown timestamps. Cached public feed JSON is stored in app cache. Settings persist until app data is cleared/uninstalled; public metadata/live cache has a five-minute operational lifetime and expired files are discarded on access; Android/the user can also clear it. `allowBackup` is false. |
 | Security / deletion | API traffic uses HTTPS. App data is stored in Android app-private storage, with no developer-operated account or server copy. Users can remove alert rules in-app or clear app data/uninstall. |
 
 ## Location and foreground-service review
