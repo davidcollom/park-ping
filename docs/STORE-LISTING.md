@@ -29,7 +29,8 @@ Park Ping is an independent app and is not affiliated with Disney, Universal or 
 ## Before this goes live
 
 - Replace concept images with verified screenshots of the native release candidate: issue #2.
-- Finish adaptive icons and Play graphics: issue #1.
+- Review and approve the candidate mascot identity with Dave before publication: issue #1. The Play icon and feature graphic are exported in `docs/store-assets/`; editable SVG layouts are in `docs/brand/`.
+- Confirm the 512 × 512 app icon and 1024 × 500 feature graphic against the current Play Console requirements when uploading.
 - Add the actual support contact and published privacy-policy URL: issues #5 and #10.
 - Verify descriptions against shipping behaviour, park names and current Console limits.
 - Complete compatibility, signed AAB and Play testing work: issues #3, #4, #6 and #9.

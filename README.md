@@ -29,7 +29,7 @@ These screenshots are from the interactive design mock-up, using **sample data**
 | --- | --- | --- |
 | <img src="docs/images/mockup-nearby.png" width="260" alt="Design mock-up showing nearby rides with sample wait times"> | <img src="docs/images/mockup-alert-controls.png" width="260" alt="Design mock-up of queue, distance and cooldown controls"> | <img src="docs/images/mockup-notification.png" width="260" alt="Design mock-up showing an explicitly labelled sample notification"> |
 
-The little location-pin scout above is our first mascot concept. Bringing it into the app and finishing the launcher/store icons is tracked in [#1](https://github.com/davidcollom/park-ping/issues/1).
+The location-pin scout above now appears in the Android launcher, app header and empty states. Candidate Play artwork is in [docs/store-assets](docs/store-assets); the identity still needs Dave's review before publication.
 
 ## Try it on your phone
 

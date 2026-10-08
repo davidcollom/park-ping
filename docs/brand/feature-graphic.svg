@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="500" viewBox="0 0 1024 500">
+  <rect width="1024" height="500" fill="#eaf7f3"/>
+  <image href="../images/park-ping-mascot.png" x="28" y="28" width="444" height="444" preserveAspectRatio="xMidYMid meet"/>
+  <text x="490" y="204" fill="#142d3a" font-family="sans-serif" font-size="52" font-weight="700">A shorter queue.</text>
+  <text x="510" y="260" fill="#08786f" font-family="sans-serif" font-size="34" font-weight="700">Just around the corner.</text>
+  <text x="512" y="326" fill="#334b54" font-family="sans-serif" font-size="24">Set a limit. We’ll ping when a nearby</text>
+  <text x="512" y="362" fill="#334b54" font-family="sans-serif" font-size="24">ride is ready.</text>
+</svg>
