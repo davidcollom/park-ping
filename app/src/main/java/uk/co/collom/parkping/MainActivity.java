@@ -44,7 +44,18 @@ public final class MainActivity extends Activity {
                 == android.content.res.Configuration.UI_MODE_NIGHT_YES;
         setTheme(dark ? R.style.AppThemeDark : R.style.AppTheme);
         super.onCreate(state); store = new Store(this);
-        colours(); MonitorService.channels(this); build(); refresh();
+        colours(); MonitorService.channels(this); build(); addSupportButton(); refresh();
+    }
+    private void addSupportButton() {
+        Button support = button("Help or report a problem ↗", () -> {
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW,
+                        Uri.parse("https://github.com/davidcollom/park-ping/issues/new/choose")));
+            } catch (ActivityNotFoundException e) {
+                message("No browser is available to open the support form.");
+            }
+        }, false);
+        screen.addView(support, 1);
     }
     private void colours() {
         boolean dark = (getResources().getConfiguration().uiMode & android.content.res.Configuration.UI_MODE_NIGHT_MASK)
@@ -93,10 +104,6 @@ public final class MainActivity extends Activity {
         setContentView(screen);
         screen.addView(text("Park Ping", 28, true));
         screen.addView(note("A shorter queue. Just around the corner.")); addGap(screen, 8);
-        TextView support = note("Help or report a problem ↗"); support.setTextColor(purple);
-        support.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://github.com/davidcollom/park-ping/issues/new/choose"))));
-        screen.addView(support);
         Spinner parks = new Spinner(this);
         ArrayAdapter<Models.Park> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Models.PARKS);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); parks.setAdapter(adapter); parks.setSelection(store.parkIndex());
