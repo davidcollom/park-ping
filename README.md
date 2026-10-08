@@ -57,7 +57,7 @@ Availability and wait times depend on the live data feed.
 
 Park Ping uses your location on your device to calculate ride distances. It does not send your coordinates to the park-data provider. The app has no account system or analytics SDKs.
 
-Live data requests use park IDs and expose normal network information such as your IP address. Monitoring starts when you switch on Park mode, with an ongoing notification and a stop control. Android battery settings may delay checks or stop monitoring.
+Live data requests use park IDs and expose normal network information such as your IP address. The provider may observe or log request metadata; its logging and retention practices have not been independently verified here. Monitoring starts when you switch on Park mode, with an ongoing notification and a stop control. Location remains on-device, while requests for live queue data are shared and kept at least five minutes apart. Android battery settings may delay checks or stop monitoring.
 
 ## Help shape the first release
 
@@ -67,4 +67,4 @@ The [Google Play launch tracker](https://github.com/davidcollom/park-ping/issues
 
 For building or maintaining the app, see [the developer guide](docs/DEVELOPING.md) and [the signing guide](SIGNING.md).
 
-Ride data is provided by [ThemeParks.wiki](https://themeparks.wiki). Park Ping is an independent app, unaffiliated with Disney, Universal or ThemeParks.wiki. See the [live-data and branding review](docs/DATA-AND-BRAND-REVIEW.md) before public distribution.
+Ride data is [powered by ThemeParks.wiki](https://www.themeparks.wiki/terms). Park Ping is an independent app, unaffiliated with Disney, Universal or ThemeParks.wiki, and uses original branding and artwork. See the [live-data and branding review](docs/DATA-AND-BRAND-REVIEW.md) before distribution.

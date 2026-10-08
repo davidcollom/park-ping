@@ -11,7 +11,7 @@ Technical reference for contributors. For the visitor-facing overview, see [the 
 - Ridden state resets by the park's local date, rather than the phone's timezone.
 - Local persistence of favourites, rules and notification cooldowns.
 - User-started location foreground service with a persistent notification and stop action. No all-the-time location permission, automatic boot start, accounts or app backend.
-- Fetching approximately every two minutes; bounded network timeouts and additional retry backoff.
+- Park mode checks location locally about every two minutes; shared provider requests are at least five minutes apart, with persisted `Retry-After` backoff for HTTP 429 and bounded network timeouts.
 - Missing waits are never interpreted as zero. Cached/offline feeds cannot trigger alerts.
 - Alerts require an operating ride, a feed timestamp within ten minutes, a location fix within two minutes and reported accuracy of 100 metres or better.
 - Threshold notifications on entering a matching state, with a persisted cooldown; no repeated alerts while a ride continuously qualifies.
@@ -93,6 +93,6 @@ Code structure:
 
 ## Privacy and data
 
-Location is only used locally to calculate ride distances; coordinates are not sent to the data provider. Network requests contain park IDs and normal network metadata such as your IP address. No analytics or third-party tracking SDKs are included. Local preferences and cached feeds are excluded from Android backup. The Android permission prompt and Park mode explanation precede active location monitoring.
+Location is only used locally to calculate ride distances; coordinates are not sent to the data provider. Requests contain park IDs and expose normal transport metadata, including your IP address. The provider may observe or log request metadata; its logging and retention practices have not been independently verified here. The app includes no analytics or third-party tracking SDKs. Local preferences and cached feeds are excluded from Android backup. The Android permission prompt and Park mode explanation precede active location monitoring.
 
-Ride data comes from [ThemeParks.wiki](https://themeparks.wiki). The [live-data and branding review](DATA-AND-BRAND-REVIEW.md) records the current attribution, polling, outage, and distribution findings.
+Ride data is [powered by ThemeParks.wiki](https://www.themeparks.wiki/terms). The [live-data and branding review](DATA-AND-BRAND-REVIEW.md) records the official terms basis, current request/cache behavior and independent-branding assessment.

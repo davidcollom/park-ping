@@ -126,7 +126,7 @@ public final class MainActivity extends Activity {
     private void toggleSession() {
         if (MonitorService.active) { stopService(new Intent(this, MonitorService.class)); main.postDelayed(this::updateSession, 200); return; }
         new AlertDialog.Builder(this).setTitle("Enable Park mode?")
-                .setMessage("Park Ping will check your location and live queues about every two minutes, including with the screen off. A persistent notification lets you stop it. Location is used on this device and is not uploaded. Park mode ends after 12 hours. Android power saving can delay checks.")
+                .setMessage("Park Ping checks your location about every two minutes and refreshes live queues no more often than every five minutes, including with the screen off. A persistent notification lets you stop it. Location is used on this device and is not uploaded. Park mode ends after 12 hours. Android power saving can delay checks.")
                 .setNegativeButton("Cancel", null).setPositiveButton("Continue", (d, w) -> permissionsAndStart()).show();
     }
     private void permissionsAndStart() {
@@ -232,8 +232,8 @@ public final class MainActivity extends Activity {
         if (page.equals("Nearby") && MonitorService.latestLocation == null) content.addView(note("Start Park mode for nearby distances. You can set alerts first."));
         for (Models.Ride r : visible) rideCard(r);
         addGap(content, 16);
-        TextView attribution = note("Data: ThemeParks.wiki ↗ · Independent, unofficial app; not affiliated with Disney, Universal or ThemeParks.wiki.");
-        attribution.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://themeparks.wiki")))); content.addView(attribution);
+        TextView attribution = note("Powered by ThemeParks.wiki ↗ · Independent, unofficial app; not affiliated with Disney, Universal or ThemeParks.wiki.");
+        attribution.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.themeparks.wiki/terms")))); content.addView(attribution);
     }
     private void rideCard(Models.Ride r) {
         addGap(content, 12); LinearLayout c = vertical(); c.setPadding(dp(14), dp(14), dp(14), dp(14)); c.setBackground(surface(card, 18, true));

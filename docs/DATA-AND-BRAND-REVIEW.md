@@ -1,23 +1,23 @@
 # Live data and independent-brand review
 
-Reviewed 8 October 2026, before public or commercial distribution. This records the provider and app documentation checked; it is not legal advice.
+Reviewed 8 October 2026. This records the official provider terms and app behavior checked; it is not legal advice.
 
 ## ThemeParks.wiki data
 
-Park Ping requests live park data from `https://api.themeparks.wiki/v1`. The provider's [JavaScript SDK documentation](https://github.com/ThemeParks/ThemeParks_JavaScript#client-options) describes live wait-time access, optional API keys, and an identifying `User-Agent`. Its [rate-limit guidance](https://github.com/ThemeParks/ThemeParks_JavaScript#rate-limits) says requests are metered per minute and describes server-reported limits; the [Python SDK documentation](https://github.com/ThemeParks/ThemeParks_Python#client-options) says API keys provide higher limits and access beyond the free tier. These are API-client documents, not a data licence.
+Park Ping requests live park data from `https://api.themeparks.wiki/v1`. The official [ThemeParks.wiki API terms](https://www.themeparks.wiki/terms), reviewed on 8 October 2026, permit free and paid consumer apps to display the data without prior permission, subject to the terms. They prohibit mirroring, re-APIing and bulk redistribution; allow short operational caching; require visibly linked “Powered by ThemeParks.wiki” attribution; recommend polling no more often than every five minutes; and require respecting HTTP 429 `Retry-After`.
 
-The provider material reviewed does not establish whether third-party apps may republish the feed, whether commercial use is permitted, what attribution is required, or a fixed polling interval for this use. No explicit permission or applicable data-use licence could be verified from those materials. Do not infer permission from the API being publicly reachable or from SDK source-code licences.
+The provider's [JavaScript SDK documentation](https://github.com/ThemeParks/ThemeParks_JavaScript#client-options) describes live wait-time access, optional API keys and an identifying `User-Agent`; its [rate-limit guidance](https://github.com/ThemeParks/ThemeParks_JavaScript#rate-limits) and [Python SDK documentation](https://github.com/ThemeParks/ThemeParks_Python#client-options) describe quotas and API-key tiers. These client documents do not replace the API terms. The reviewed terms authorize this consumer-app display use, not a data service, mirror, bulk export or third-party branding. This interpretation is limited to the linked terms and does not grant rights beyond them.
 
 ### Park Ping's current request and outage behavior
 
-- The app refreshes live data about every two minutes while its screen is open or Park mode is active. An open screen and Park mode can each poll; the Refresh button is also user-triggered. Park metadata is cached for up to 24 hours.
-- Requests identify themselves as `ParkPing/0.1 (personal Android prototype)`. The app does not send an API key or currently inspect provider rate-limit headers.
-- On a non-success response or network failure, the app retains the last successful data for display where available. Park mode pauses alerts for cached data and adds up to ten minutes of backoff to its polling delay after repeated failures; without cached data, loading fails. Displayed wait ages remain visible and stale data is not eligible for alerts.
-- The provider documentation reviewed describes server-side rate limits but no fixed public polling ceiling. The current two-minute interval is Park Ping's behavior, not a provider-approved limit. Re-check current provider guidance and honor any applicable quota before release.
+- The screen and Park mode can independently request refreshes, and the screen has a manual Refresh button; a shared lock and persisted gate allow no more than one provider refresh every five minutes across both callers.
+- Park and live-response cache files are used only for five minutes and expired files are discarded on the next load. A throttled or offline cached snapshot is marked cached, and Park mode never sends alerts from it. Alert freshness and location checks remain local.
+- Requests identify themselves as `ParkPing/0.1 (personal Android prototype)` and do not send an API key. A 429 response is handled using its `Retry-After` value (including HTTP-date form), with the backoff persisted across process restarts; malformed or missing values fall back to the five-minute minimum.
+- Location coordinates are not sent to the provider. Requests include park IDs and expose ordinary network metadata such as the user's IP address. The provider may observe or log request metadata; its logging and retention practices were not verified by this review.
 
 ### Distribution decision and follow-up
 
-**Public/commercial distribution is not cleared by this review.** Before publishing, ask ThemeParks.wiki for written confirmation of permission and conditions for this app's live-data display and redistribution, including commercial use, attribution, caching, and request frequency. Confirm the applicable API-key tier/quota and update the app's request identification if needed. If suitable permission or terms cannot be confirmed, disable the live feed or move to a source whose licence explicitly allows the intended use. Keep this as a release gate; this document does not grant permission.
+**Documented distribution basis:** the reviewed terms permit free or paid consumer-app display without prior permission, provided their conditions are followed. Park Ping displays the data within the app, does not expose a feed or bulk export, uses a five-minute shared refresh/cache limit, honors 429 backoff, and shows linked attribution. Recheck the official terms and actual shipping behavior before release and whenever the terms or use changes. If the app's use expands to rehosting, re-APIing or bulk redistribution, this review does not authorize that use.
 
 ## Name, artwork, and disclosure
 
