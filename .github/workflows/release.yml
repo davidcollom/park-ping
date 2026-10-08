@@ -96,7 +96,13 @@ jobs:
           else
             printf '\nDevelopment signing: a new key is generated for this workflow run. You may need to uninstall an earlier version before installing this build; uninstalling removes local favourites and alert settings. Configure the four PARKPING signing secrets for consistent updates.\n' >> "$RUNNER_TEMP/release-notes.md"
           fi
+          gh api --method POST "repos/$GITHUB_REPOSITORY/releases/generate-notes" \
+            -f tag_name="$RELEASE_TAG" -f configuration_file_path=.github/release.yml \
+            --jq .body > "$RUNNER_TEMP/generated-changelog.md"
+          printf '\n## Changes in this release\n\n' >> "$RUNNER_TEMP/release-notes.md"
+          cat "$RUNNER_TEMP/generated-changelog.md" >> "$RUNNER_TEMP/release-notes.md"
           if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md" --repo "$GITHUB_REPOSITORY"
             gh release upload "$RELEASE_TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
           else
             gh release create "$RELEASE_TAG" dist/* --verify-tag --prerelease \

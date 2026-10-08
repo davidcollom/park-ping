@@ -36,6 +36,7 @@ public final class MonitorService extends Service implements LocationListener {
         NotificationManager n = c.getSystemService(NotificationManager.class);
         return (Build.VERSION.SDK_INT < 33 || c.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
                 && n.areNotificationsEnabled()
+                && n.getNotificationChannel(SESSION_CHANNEL).getImportance() != NotificationManager.IMPORTANCE_NONE
                 && n.getNotificationChannel(ALERT_CHANNEL).getImportance() != NotificationManager.IMPORTANCE_NONE;
     }
     @Override public void onCreate() {
@@ -72,7 +73,7 @@ public final class MonitorService extends Service implements LocationListener {
     private Notification sessionNotification(String text) {
         Intent stop = new Intent(this, MonitorService.class).setAction("STOP");
         PendingIntent stopAction = PendingIntent.getService(this, 2, stop, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        return new Notification.Builder(this, SESSION_CHANNEL).setSmallIcon(R.drawable.ic_ping)
+        return new Notification.Builder(this, SESSION_CHANNEL).setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("Park Ping · Park mode on").setContentText(text).setOngoing(true)
                 .setContentIntent(openApp()).addAction(new Notification.Action.Builder(null, "Stop Park mode", stopAction).build()).build();
     }
@@ -110,7 +111,7 @@ public final class MonitorService extends Service implements LocationListener {
                         matched.getOrDefault(ride.id(), false), previousStatus.get(ride.id()), store.lastPing(ride.id()), now);
                 if (decision.shouldNotify() && active && notificationsAllowed(this)) {
                     Notification alert = new Notification.Builder(this, ALERT_CHANNEL)
-                            .setSmallIcon(R.drawable.ic_ping).setContentTitle(ride.name())
+                            .setSmallIcon(R.drawable.ic_notification).setContentTitle(ride.name())
                             .setContentText(decision.reason() + " · " + (ride.waitMinutes() == null ? "Queue unavailable" : ride.waitMinutes() + " min queue")
                                     + " · " + Math.round(distance) + " m away")
                             .setContentIntent(openApp()).setAutoCancel(true).build();

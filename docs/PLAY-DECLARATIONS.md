@@ -25,7 +25,7 @@ Prepared from the Android source for the current signed APK, version 0.0.1. This
 
 - [Google Play privacy policy and Data safety requirements](https://support.google.com/googleplay/android-developer/answer/9859455)
 - [Google Play location permissions policy](https://support.google.com/googleplay/android-developer/answer/9799150)
-- [Park Ping privacy policy draft](https://github.com/davidcollom/park-ping/blob/main/docs/privacy-policy.html) — public hosted URL still pending
+- [Park Ping privacy policy draft](privacy-policy.html) — publication is blocked until a rendered URL is anonymously reachable; keep issue #5 open until verified
 - Public support channel: [Park Ping issue tracker](https://github.com/davidcollom/park-ping/issues/new)
 
 Before publication, verify the developer name and support URL in the Play Console, confirm the policy URL is publicly accessible without sign-in, verify the provider's current data practices, and ensure the declarations match the exact release binary.

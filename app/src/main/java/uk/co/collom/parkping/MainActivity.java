@@ -19,7 +19,6 @@ import java.util.concurrent.*;
 
 /** Native Android UI for the approved phone prototype. */
 public final class MainActivity extends Activity {
-    private static final String PRIVACY_POLICY_URL = "https://github.com/davidcollom/park-ping/issues/5";
     private final ExecutorService network = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
     private Store store;
@@ -32,7 +31,7 @@ public final class MainActivity extends Activity {
     private String page = "Nearby";
     private int generation;
     private long refreshed;
-    private int background, ink, muted, card, line, purple, onPurple, soft;
+    private int background, ink, muted, card, line, accent, onAccent, purple, onPurple, soft;
     private final Runnable ticker = new Runnable() {
         @Override public void run() {
             updateSession();
@@ -55,9 +54,11 @@ public final class MainActivity extends Activity {
         ink = Color.parseColor(dark ? "#EDF0FF" : "#202238");
         muted = Color.parseColor(dark ? "#B3BBCE" : "#62657A");
         line = Color.parseColor(dark ? "#353D53" : "#E1E2ED");
-        purple = Color.parseColor(dark ? "#C9BBFF" : "#5941C9");
-        onPurple = Color.parseColor(dark ? "#231448" : "#FFFFFF");
-        soft = Color.parseColor(dark ? "#302547" : "#EEE9FF");
+        accent = Color.parseColor(dark ? "#72D8C7" : "#08786F");
+        onAccent = Color.parseColor(dark ? "#102E2B" : "#FFFFFF");
+        purple = accent;
+        onPurple = onAccent;
+        soft = Color.parseColor(dark ? "#203B3A" : "#E3F5F0");
     }
     private int dp(int value) { return Math.round(value * getResources().getDisplayMetrics().density); }
     private GradientDrawable surface(int colour, int radius, boolean border) {
@@ -74,7 +75,7 @@ public final class MainActivity extends Activity {
     private Button button(String title, Runnable click, boolean primary) {
         Button b = new Button(this); b.setText(title); b.setAllCaps(false); b.setTextSize(14);
         b.setMinHeight(dp(48)); b.setMinimumWidth(0); b.setPadding(dp(12), dp(5), dp(12), dp(5));
-        b.setTextColor(primary ? onPurple : purple); b.setBackground(surface(primary ? purple : soft, 12, false));
+        b.setTextColor(primary ? onAccent : accent); b.setBackground(surface(primary ? accent : soft, 12, false));
         b.setOnClickListener(v -> click.run()); return b;
     }
     private void addGap(LinearLayout parent, int height) { View v = new View(this); parent.addView(v, new LinearLayout.LayoutParams(1, dp(height))); }
@@ -92,8 +93,16 @@ public final class MainActivity extends Activity {
             return insets;
         });
         setContentView(screen);
-        screen.addView(text("Park Ping", 28, true));
-        screen.addView(note("A shorter queue. Just around the corner.")); addGap(screen, 8);
+        LinearLayout brand = horizontal();
+        ImageView mascot = new ImageView(this); mascot.setImageResource(R.drawable.park_ping_mascot);
+        mascot.setContentDescription("Park Ping smiling location-pin mascot");
+        mascot.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        brand.addView(mascot, new LinearLayout.LayoutParams(dp(64), dp(64)));
+        LinearLayout wordmark = vertical(); wordmark.setPadding(dp(10), 0, 0, 0);
+        wordmark.addView(text("Park Ping", 28, true));
+        wordmark.addView(note("A shorter queue. Just around the corner."));
+        brand.addView(wordmark, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        screen.addView(brand); addGap(screen, 8);
         Spinner parks = new Spinner(this);
         ArrayAdapter<Models.Park> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Models.PARKS);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); parks.setAdapter(adapter); parks.setSelection(store.parkIndex());
@@ -174,7 +183,7 @@ public final class MainActivity extends Activity {
         if (!MonitorService.notificationsAllowed(this)) { message("Enable ride notifications in Android settings to send a test."); return; }
         PendingIntent open = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         getSystemService(NotificationManager.class).notify(100,
-                new Notification.Builder(this, MonitorService.ALERT_CHANNEL).setSmallIcon(R.drawable.ic_ping)
+                new Notification.Builder(this, MonitorService.ALERT_CHANNEL).setSmallIcon(R.drawable.ic_notification)
                         .setContentTitle("Park Ping · Test notification")
                         .setContentText("Example only: a favourite ride has a 15 min queue, 250 m away.")
                         .setContentIntent(open).setAutoCancel(true).build());
@@ -227,15 +236,19 @@ public final class MainActivity extends Activity {
         }
         visible.sort(Comparator.comparing((Models.Ride r) -> !store.favourite(r.id()))
                 .thenComparingDouble(r -> distance(r) == null ? Double.POSITIVE_INFINITY : distance(r)).thenComparing(Models.Ride::name));
-        if (visible.isEmpty() && !loading) content.addView(note(page.equals("My alerts")
-                ? "Choose Set alert on a ride to create your first rule." : page.equals("Favourites")
-                ? "Favourite a ride from Nearby to keep it here." : "No ride data is available yet."));
+        if (visible.isEmpty() && !loading) {
+            if (page.equals("My alerts")) emptyState("Your alerts start here",
+                    "Choose Set alert on a ride to create your first rule.");
+            else if (page.equals("Favourites")) emptyState("Your favourites are waiting",
+                    "Favourite a ride from Nearby to keep it here.");
+            else emptyState("Your park day is just getting started",
+                    "No ride data is available yet. Try refreshing in a moment.");
+        }
         if (page.equals("Nearby") && MonitorService.latestLocation == null) content.addView(note("Start Park mode for nearby distances. You can set alerts first."));
         for (Models.Ride r : visible) rideCard(r);
         addGap(content, 16);
         TextView attribution = note("Data: ThemeParks.wiki ↗ · Unofficial app, not affiliated with Disney or Universal.");
         attribution.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://themeparks.wiki")))); content.addView(attribution);
-        content.addView(button("Privacy policy", () -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(PRIVACY_POLICY_URL))), false));
     }
     private void rideCard(Models.Ride r) {
         addGap(content, 12); LinearLayout c = vertical(); c.setPadding(dp(14), dp(14), dp(14), dp(14)); c.setBackground(surface(card, 18, true));
@@ -251,6 +264,17 @@ public final class MainActivity extends Activity {
         weighted(actions, button(q == null ? "Set alert" : "Edit alert", () -> edit(r), false)); c.addView(actions);
         c.addView(button(store.ridden(r.id()) ? "Undo ridden today" : "Mark ridden today", () -> { store.toggleRidden(r.id()); render(); }, false));
         content.addView(c);
+    }
+    private void emptyState(String title, String description) {
+        LinearLayout state = horizontal(); state.setPadding(dp(14), dp(12), dp(14), dp(12));
+        state.setBackground(surface(card, 18, true));
+        ImageView mascot = new ImageView(this); mascot.setImageResource(R.drawable.park_ping_mascot);
+        mascot.setContentDescription(null); mascot.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        state.addView(mascot, new LinearLayout.LayoutParams(dp(68), dp(68)));
+        LinearLayout copy = vertical(); copy.setPadding(dp(12), 0, 0, 0);
+        copy.addView(text(title, 16, true)); copy.addView(note(description));
+        state.addView(copy, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+        content.addView(state);
     }
     private void edit(Models.Ride r) {
         AlertEngine.Rule saved = store.rule(r.id());

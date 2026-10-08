@@ -26,14 +26,15 @@ Queue times are posted estimates and can change. Distance is a straight-line rad
 
 Park Ping is an independent app and is not affiliated with Disney, Universal or ThemeParks.wiki.
 
-Privacy policy: https://github.com/davidcollom/park-ping/issues/5 (hosted URL pending)
 Support and privacy questions: https://github.com/davidcollom/park-ping/issues/new
 
 ## Before this goes live
 
 - Replace concept images with verified screenshots of the native release candidate: issue #2.
-- Finish adaptive icons and Play graphics: issue #1.
-- Verify the public privacy-policy URL, developer identity and support contact in the Play Console.
+- Review and approve the candidate mascot identity with Dave before publication: issue #1. The Play icon and feature graphic are exported in `docs/store-assets/`; editable SVG layouts are in `docs/brand/`.
+- Confirm the 512 × 512 app icon and 1024 × 500 feature graphic against the current Play Console requirements when uploading.
+- Publish the reviewed [privacy policy draft](privacy-policy.html) at a rendered URL that is anonymously accessible; issue #5 remains open until verified.
+- Add the actual support contact in the Play Console: issue #10.
 - Complete and verify the [Data safety and location declaration worksheet](PLAY-DECLARATIONS.md) against the release binary and ThemeParks.wiki's current data practices.
 - Verify descriptions against shipping behaviour, park names and current Console limits.
 - Complete compatibility, signed AAB and Play testing work: issues #3, #4, #6 and #9.
