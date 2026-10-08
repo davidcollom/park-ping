@@ -40,7 +40,9 @@ These are general published limits, not a check of this app’s Play Console lis
 - Capture representative Nearby, favourites and alert-controls screens, plus a test notification that is visibly identified as an example. Do not imply that the example is a live ride alert.
 - Check light and dark appearances, increased font size and the smallest supported screen. Replace README mock-ups only when real captures accurately represent the release candidate.
 - Review all screenshots against the installed release candidate and the current Console asset requirements before upload.
-- Finish adaptive icons and Play graphics (issue #1), add the actual support contact and published privacy-policy URL (issues #5 and #10), and complete compatibility, signed AAB and Play testing work (issues #3, #4, #6 and #9).
+- Review and approve the candidate mascot identity with Dave before publication (issue #1). The Play icon and feature graphic are exported in `docs/store-assets/`; editable SVG layouts are in `docs/brand/`.
+- Confirm the 512 × 512 app icon and 1024 × 500 feature graphic against current Play Console requirements when uploading.
+- Add the actual support contact and published privacy-policy URL (issues #5 and #10), and complete compatibility, signed AAB and Play testing work (issues #3, #4, #6 and #9).
 - Recheck the copy against release behavior, supported parks and the current Console limits.
 
 See [the launch tracker](https://github.com/davidcollom/park-ping/issues/11). No Play listing has been published.
