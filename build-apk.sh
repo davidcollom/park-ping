@@ -4,8 +4,8 @@ set -euo pipefail
 cd "$(dirname "$0")"
 : "${ANDROID_HOME:?Set ANDROID_HOME to your Android SDK directory}"
 : "${JAVA_HOME:?Set JAVA_HOME to a JDK 17 directory}"
-build_tools="$ANDROID_HOME/build-tools/35.0.0"
-android_jar="$ANDROID_HOME/platforms/android-35/android.jar"
+build_tools="$ANDROID_HOME/build-tools/36.0.0"
+android_jar="$ANDROID_HOME/platforms/android-36/android.jar"
 output="$PWD/app/build/manual"
 version_name="${PARKPING_VERSION_NAME:-0.1.0}"
 version_code="${PARKPING_VERSION_CODE:-1}"
@@ -27,7 +27,7 @@ Path(sys.argv[1]).write_text(manifest)
 PY
 "$build_tools/aapt2" compile --dir app/src/main/res -o "$output/resources.zip"
 "$build_tools/aapt2" link -o "$output/resources.apk" --manifest "$output/AndroidManifest.xml" \
-    -I "$android_jar" --java "$output/gen" --min-sdk-version 26 --target-sdk-version 35 \
+    -I "$android_jar" --java "$output/gen" --min-sdk-version 26 --target-sdk-version 36 \
     --version-code "$version_code" --version-name "$version_name" "$output/resources.zip"
 "$JAVA_HOME/bin/javac" --release 17 -classpath "$android_jar" -d "$output/classes" \
     app/src/main/java/uk/co/collom/parkping/*.java "$output/gen/uk/co/collom/parkping/R.java"
