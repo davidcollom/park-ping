@@ -79,6 +79,9 @@ public final class MonitorService extends Service implements LocationListener {
     private PendingIntent openApp() {
         return PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
+    private void updateSessionNotification() {
+        getSystemService(NotificationManager.class).notify(1, sessionNotification(status));
+    }
     private void poll() {
         if (!active) return;
         if (SystemClock.elapsedRealtime() - started >= 12 * 60 * 60_000L) {
@@ -87,10 +90,10 @@ public final class MonitorService extends Service implements LocationListener {
         try {
             ParkApi.Snapshot snapshot = new ParkApi(this).load(monitoredPark);
             if (!active) return;
-            if (snapshot.cached()) { status = snapshot.message(); return; }
+            if (snapshot.cached()) { status = snapshot.message(); updateSessionNotification(); return; }
             failures = 0;
             android.location.Location location = latestLocation;
-            if (location == null) { status = "Waiting for a fresh location"; return; }
+            if (location == null) { status = "Waiting for a fresh location"; updateSessionNotification(); return; }
             long age = (SystemClock.elapsedRealtimeNanos() - location.getElapsedRealtimeNanos()) / 1_000_000;
             long now = System.currentTimeMillis(); int watched = 0;
             for (Models.Ride ride : snapshot.rides()) {
@@ -118,9 +121,10 @@ public final class MonitorService extends Service implements LocationListener {
             }
             status = age > AlertEngine.MAX_LOCATION_AGE_MS ? "Location is stale — alerts paused"
                     : location.getAccuracy() > 100 ? "Location too approximate — alerts paused" : "Watching " + watched + " rides · checked just now";
-            getSystemService(NotificationManager.class).notify(1, sessionNotification(status));
+            updateSessionNotification();
         } catch (Exception e) {
             failures++; status = "Park feed unavailable — retrying; alerts paused";
+            updateSessionNotification();
             // A bounded extra delay backs off repeated network failures; interrupted on stop.
             if (failures > 1) {
                 try { Thread.sleep(Math.min(600_000L, failures * 60_000L)); }
