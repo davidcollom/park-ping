@@ -26,7 +26,7 @@ Queue times are posted estimates and can change. Distance is a straight-line rad
 
 Park Ping is an independent app and is not affiliated with Disney, Universal or ThemeParks.wiki.
 
-Privacy policy: https://github.com/davidcollom/park-ping/blob/main/docs/privacy-policy.html
+Privacy policy: https://github.com/davidcollom/park-ping/issues/5 (hosted URL pending)
 Support and privacy questions: https://github.com/davidcollom/park-ping/issues/new
 
 ## Before this goes live

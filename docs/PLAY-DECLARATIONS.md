@@ -1,6 +1,6 @@
 # Google Play privacy declarations — review worksheet
 
-Prepared from the Android source for Park Ping 0.1.0. This is a review worksheet, not a completed Play Console submission. Recheck the shipped binary, the current Play Console questions, and ThemeParks.wiki's current privacy practices before submitting.
+Prepared from the Android source for the current signed APK, version 0.0.1. This is a review worksheet, not a completed Play Console submission. Recheck the shipped binary, the current Play Console questions, and ThemeParks.wiki's current privacy practices before submitting. The app does not yet have a published hosted privacy policy URL, and the provider/data-safety answers remain unresolved until the review is complete.
 
 ## Data safety
 
@@ -25,7 +25,7 @@ Prepared from the Android source for Park Ping 0.1.0. This is a review worksheet
 
 - [Google Play privacy policy and Data safety requirements](https://support.google.com/googleplay/android-developer/answer/9859455)
 - [Google Play location permissions policy](https://support.google.com/googleplay/android-developer/answer/9799150)
-- [Park Ping privacy policy](https://github.com/davidcollom/park-ping/blob/main/docs/privacy-policy.html)
+- [Park Ping privacy policy draft](https://github.com/davidcollom/park-ping/blob/main/docs/privacy-policy.html) — public hosted URL still pending
 - Public support channel: [Park Ping issue tracker](https://github.com/davidcollom/park-ping/issues/new)
 
 Before publication, verify the developer name and support URL in the Play Console, confirm the policy URL is publicly accessible without sign-in, verify the provider's current data practices, and ensure the declarations match the exact release binary.

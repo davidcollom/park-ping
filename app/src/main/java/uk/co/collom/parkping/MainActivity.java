@@ -19,7 +19,7 @@ import java.util.concurrent.*;
 
 /** Native Android UI for the approved phone prototype. */
 public final class MainActivity extends Activity {
-    private static final String PRIVACY_POLICY_URL = "https://github.com/davidcollom/park-ping/blob/main/docs/privacy-policy.html";
+    private static final String PRIVACY_POLICY_URL = "https://github.com/davidcollom/park-ping/issues/5";
     private final ExecutorService network = Executors.newSingleThreadExecutor();
     private final Handler main = new Handler(Looper.getMainLooper());
     private Store store;

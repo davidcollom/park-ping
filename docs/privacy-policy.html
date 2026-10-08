@@ -14,8 +14,9 @@
   <main>
     <h1>Park Ping privacy policy</h1>
     <p><strong>Effective date:</strong> 8 October 2026</p>
-    <p>Park Ping is an independent Android app developed by David Collom (GitHub: <a href="https://github.com/davidcollom">davidcollom</a>). This policy describes the current app, version 0.1.0.</p>
-
+    <p>Park Ping is an independent Android app developed by David Collom (GitHub: <a href="https://github.com/davidcollom">davidcollom</a>). This draft describes the app's current source behavior and the signed APK version 0.0.1.</p>
+    <p><strong>Publication status:</strong> a public, rendered policy URL is not available yet. The app and store listing should link to that hosted page only after it is anonymously reachable without sign-in and matches the final release. This file remains a review draft until that public URL is ready.</p>
+ 
     <h2>Location</h2>
     <p>If you grant location permission and start Park mode, Android provides your approximate or precise device location to Park Ping. The app uses it on your device to calculate straight-line distances between you and rides and to decide whether your alert rules match. Your coordinates are not sent to Park Ping's developer or to ThemeParks.wiki, and the app does not save them to its preferences or feed cache.</p>
     <p>The latest location fix is held temporarily in app memory during the session and cleared when the session ends or the service is destroyed. Android and the location provider configured on your device may process location under their own privacy terms.</p>
@@ -28,10 +29,9 @@
     <ul>
       <li>App settings store your selected park, favourite ride IDs, alert rules, ride-date markers, and notification cooldown timestamps in Android app-private preferences.</li>
       <li>Ride and queue responses are cached in the app's private cache for offline display. Park metadata is refreshed when older than 24 hours; live data is replaced after a successful refresh. Cache files can otherwise remain until replaced or cleared.</li>
-      <li>These settings and cached feeds are not included in Android backup. They remain on the device until you clear Park Ping's app data/cache or uninstall the app; alert settings can also be removed in the app.</li>
+    <li>These settings and cached feeds are not guaranteed to be excluded from all device-transfer or OEM backup mechanisms. The app disables Android cloud backup, but the app does not control every vendor-specific backup or migration rule. They remain on the device until you clear Park Ping's app data/cache or uninstall the app; alert settings can also be removed in the app.</li>
     </ul>
     <p>Park Ping does not keep a copy of this information on a developer-operated server. Android may remove cache files at any time.</p>
-
     <h2>Park mode and permissions</h2>
     <p>Park mode starts only after you tap its start control, review the explanation, and grant the needed location and notification permissions. It uses an Android location foreground service, with an ongoing notification and a Stop Park mode action. You can stop it in the app or from that notification. A session ends after 12 hours; it is not automatically restarted after the app or service is terminated.</p>
     <p>Location permission is needed for nearby alerts, and notification access is needed to start Park mode. You can deny either permission and continue browsing ride data. You can change or revoke permissions in Android settings; if location or notifications are unavailable, Park mode stops or cannot start. Android battery controls may delay checks.</p>
@@ -41,7 +41,7 @@
     <p>For support or privacy questions, contact the developer through <a href="https://github.com/davidcollom/park-ping/issues/new">Park Ping's GitHub issue tracker</a>. Please do not include precise location, passwords, or other sensitive information in a public issue.</p>
 
     <h2>Changes</h2>
-    <p>This policy will be updated if the app's data practices change. The current version is published in the <a href="https://github.com/davidcollom/park-ping/blob/main/docs/privacy-policy.html">Park Ping repository</a>.</p>
+    <p>This policy will be updated if the app's data practices change. The current source is available in the <a href="https://github.com/davidcollom/park-ping">Park Ping repository</a>, but a public, rendered policy URL is still pending.</p>
   </main>
 </body>
 </html>
