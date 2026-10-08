@@ -56,7 +56,16 @@ git tag v0.1.1
 git push origin v0.1.1
 ```
 
-Tag releases are testing builds by default. Without a stable signing keystore configured, builds can have different signing certificates and Android may require uninstalling the previous version before installing the new one; uninstalling removes locally saved rules and favourites. Configure the signing secrets described in the workflow before distributing builds that need reliable in-place updates. Never commit a private release signing key.
+Tag releases are testing builds by default. Without a stable signing keystore configured, builds can have different signing certificates and Android may require uninstalling the previous version before installing the new one; uninstalling removes locally saved rules and favourites. Configure all four repository Actions secrets below before distributing builds that need reliable in-place updates. Never commit a private release signing key.
+
+| Optional Actions secret | Value |
+| --- | --- |
+| `PARKPING_KEYSTORE_BASE64` | Base64-encoded contents of a persistent signing keystore |
+| `PARKPING_KEYSTORE_PASSWORD` | Keystore password |
+| `PARKPING_KEY_ALIAS` | Signing key alias |
+| `PARKPING_KEY_PASSWORD` | Key password |
+
+Configure all four together under Settings → Secrets and variables → Actions. Builds without them publish `park-ping-development.apk`; builds with them publish `park-ping.apk`. Tag names become the APK version name; CI assigns an increasing Android version code. Releases are marked as prereleases while phone testing is outstanding.
 
 ## Build and maintain
 
@@ -98,4 +107,3 @@ Code structure:
 Location is only used locally to calculate ride distances; coordinates are not sent to the data provider. Network requests contain park IDs and normal network metadata such as your IP address. No analytics or third-party tracking SDKs are included. Local preferences and cached feeds are excluded from Android backup. The Android permission prompt and Park mode explanation precede active location monitoring.
 
 Ride data: https://themeparks.wiki — please retain attribution. This is an unofficial app and is not affiliated with Disney, Universal or ThemeParks.wiki. Review the provider's current terms before public/commercial distribution.
-

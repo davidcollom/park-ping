@@ -1,0 +1,106 @@
+name: Tagged Android APK
+
+on:
+  push:
+    tags: ['**']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - name: Install pinned Android SDK packages
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - name: Check alert behaviour
+        run: ./test.sh
+      - name: Prepare optional persistent signing key
+        id: signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.PARKPING_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.PARKPING_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.PARKPING_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.PARKPING_KEY_PASSWORD }}
+        run: |
+          if [[ -n "$KEYSTORE_BASE64$KEYSTORE_PASSWORD$KEY_ALIAS$KEY_PASSWORD" ]]; then
+            if [[ -z "$KEYSTORE_BASE64" || -z "$KEYSTORE_PASSWORD" || -z "$KEY_ALIAS" || -z "$KEY_PASSWORD" ]]; then
+              echo 'All four PARKPING signing secrets are required when signing is configured.' >&2
+              exit 1
+            fi
+            printf '%s' "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/park-ping.keystore"
+            chmod 600 "$RUNNER_TEMP/park-ping.keystore"
+            echo 'persistent=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'persistent=false' >> "$GITHUB_OUTPUT"
+            echo '::warning::No persistent signing secrets: this development APK may require uninstalling an older build before installation.'
+          fi
+      - name: Build and verify tagged APK
+        env:
+          PARKPING_VERSION_NAME: ${{ github.ref_name }}
+          KEYSTORE_PASSWORD: ${{ secrets.PARKPING_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.PARKPING_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.PARKPING_KEY_PASSWORD }}
+          PERSISTENT_SIGNING: ${{ steps.signing.outputs.persistent }}
+        run: |
+          export PARKPING_VERSION_CODE="$((1000 + GITHUB_RUN_NUMBER))"
+          export PARKPING_APK_NAME=park-ping.apk
+          if [[ "$PERSISTENT_SIGNING" == true ]]; then
+            export PARKPING_KEYSTORE_FILE="$RUNNER_TEMP/park-ping.keystore"
+            export PARKPING_KEYSTORE_PASSWORD="$KEYSTORE_PASSWORD"
+            export PARKPING_KEY_ALIAS="$KEY_ALIAS"
+            export PARKPING_KEY_PASSWORD="$KEY_PASSWORD"
+          fi
+          ./build-apk.sh
+          mkdir -p dist
+          if [[ "$PERSISTENT_SIGNING" == true ]]; then
+            cp app/build/manual/park-ping.apk dist/park-ping.apk
+          else
+            cp app/build/manual/park-ping.apk dist/park-ping-development.apk
+          fi
+          (cd dist && sha256sum *.apk > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: park-ping-tagged-apk-${{ github.run_number }}
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish test release and attach APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          PERSISTENT_SIGNING: ${{ steps.signing.outputs.persistent }}
+        run: |
+          cat > "$RUNNER_TEMP/release-notes.md" <<'NOTES'
+          Park Ping Android test build. Includes the APK and SHA-256 checksum.
+
+          Download the APK on your Android phone, open it and permit installation from that source if prompted. Phone testing of permissions, layout and screen-off monitoring is still required.
+          NOTES
+          if [[ "$PERSISTENT_SIGNING" == true ]]; then
+            printf '\nSigned using the configured persistent signing key.\n' >> "$RUNNER_TEMP/release-notes.md"
+          else
+            printf '\nDevelopment signing: a new key is generated for this workflow run. You may need to uninstall an earlier version before installing this build; uninstalling removes local favourites and alert settings. Configure the four PARKPING signing secrets for consistent updates.\n' >> "$RUNNER_TEMP/release-notes.md"
+          fi
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" dist/* --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$RELEASE_TAG" dist/* --verify-tag --prerelease \
+              --title "Park Ping $RELEASE_TAG — Android test build" \
+              --notes-file "$RUNNER_TEMP/release-notes.md" --repo "$GITHUB_REPOSITORY"
+          fi
+      - name: Remove signing material
+        if: always()
+        run: rm -f "$RUNNER_TEMP/park-ping.keystore"
