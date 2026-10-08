@@ -80,7 +80,7 @@ public final class MonitorService extends Service implements LocationListener {
         return PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
     private void updateSessionNotification() {
-        getSystemService(NotificationManager.class).notify(1, sessionNotification(status));
+        if (active) getSystemService(NotificationManager.class).notify(1, sessionNotification(status));
     }
     private void poll() {
         if (!active) return;
