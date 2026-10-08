@@ -1,0 +1,105 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Park Ping — interactive concept</title><style>html{color-scheme:light}body{margin:0;background:#ffffff}</style><script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script></head><body><div id="park-ping" class="viz-dotted-background">
+<style>
+#park-ping {padding:20px 8px; font-family:system-ui,sans-serif; color-scheme:light dark; --pp-bg:light-dark(#f7f7fc,#11131e); --pp-card:light-dark(#ffffff,#1c2030); --pp-ink:light-dark(#202238,#edf0ff); --pp-muted:light-dark(#62657a,#b3bbce); --pp-line:light-dark(#e1e2ed,#353d53); --pp-primary:light-dark(#5941c9,#c9bbff); --pp-on:light-dark(#ffffff,#231448); --pp-soft:light-dark(#eee9ff,#302547); --pp-green:light-dark(#16634b,#95dfbc); --pp-good:light-dark(#e5f5ed,#173d31);}
+#park-ping * {box-sizing:border-box}
+#park-ping .phone {max-width:410px;margin:auto;background:var(--pp-bg);color:var(--pp-ink);border:1px solid var(--pp-line);border-radius:28px;overflow:hidden;box-shadow:0 14px 45px #00000018}
+#park-ping .chrome {padding:18px 22px 0;display:flex;justify-content:space-between;font-size:12px;font-weight:500}
+#park-ping header {padding:24px 22px 18px}
+#park-ping .brand {display:flex;align-items:center;gap:9px;font-size:25px;font-weight:650;letter-spacing:-.7px}
+#park-ping .brand i {color:var(--pp-primary)}
+#park-ping .sub {color:var(--pp-muted);font-size:13px;margin:7px 0 0;line-height:1.5}
+#park-ping select,#park-ping input {font:inherit;accent-color:var(--pp-primary)}
+#park-ping .park {margin-top:16px;width:100%;padding:12px;border:1px solid var(--pp-line);border-radius:12px;background:var(--pp-card);color:var(--pp-ink);font-size:15px}
+#park-ping main {padding:0 18px 18px;min-height:430px}
+#park-ping button {font:inherit;min-height:44px;cursor:inherit;border:1px solid var(--pp-line);background:var(--pp-card);color:var(--pp-ink);border-radius:12px;padding:10px 13px;font-size:14px;font-weight:500}
+#park-ping .primary {background:var(--pp-primary);color:var(--pp-on);border-color:transparent}
+#park-ping .secondary {background:var(--pp-soft);color:var(--pp-primary);border-color:transparent}
+#park-ping .row {display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#park-ping .session {padding:13px 14px;background:var(--pp-soft);border-radius:16px;margin-bottom:20px}
+#park-ping .session strong {font-size:14px;font-weight:600}
+#park-ping .session .sub {margin:3px 0 0;font-size:12px}
+#park-ping h2 {font-size:19px;letter-spacing:-.3px;margin:18px 0 5px;font-weight:600}
+#park-ping h3 {font-size:16px;margin:0;font-weight:600;line-height:1.4}
+#park-ping .ride {background:var(--pp-card);border:1px solid var(--pp-line);border-radius:18px;padding:16px;margin-top:12px}
+#park-ping .ride-top {display:flex;gap:12px;justify-content:space-between;align-items:start}
+#park-ping .wait {white-space:nowrap;font-size:23px;font-weight:650;letter-spacing:-.5px;text-align:right}
+#park-ping .wait span {display:block;color:var(--pp-muted);font-size:11px;font-weight:400;letter-spacing:0}
+#park-ping .tag {display:inline-block;color:var(--pp-green);background:var(--pp-good);padding:5px 8px;border-radius:8px;font-size:12px;margin-top:12px}
+#park-ping .actions {display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+#park-ping .actions button {flex:1}
+#park-ping nav {display:flex;border-top:1px solid var(--pp-line);background:var(--pp-card);padding:8px 8px 12px;gap:4px}
+#park-ping nav button {flex:1;min-width:0;border:0;background:transparent;padding:9px 3px;border-radius:14px;font-size:11px;display:flex;align-items:center;flex-direction:column;gap:5px}
+#park-ping nav button[aria-pressed=true] {background:var(--pp-soft);color:var(--pp-primary)}
+#park-ping .field {display:block;margin:20px 0}
+#park-ping .field .row {font-size:14px;margin-bottom:10px}
+#park-ping input[type=range] {width:100%;min-height:30px}
+#park-ping input[type=checkbox] {width:20px;height:20px;flex-shrink:0}
+#park-ping .check {display:flex;align-items:center;justify-content:space-between;gap:15px;font-size:14px;min-height:52px;margin:8px 0}
+#park-ping .editor {background:var(--pp-card);border:1px solid var(--pp-line);border-radius:18px;padding:18px;margin-top:14px}
+#park-ping .full {width:100%}
+#park-ping .notification {padding:16px;background:var(--pp-good);border-radius:16px;margin-top:15px;font-size:14px;line-height:1.5}
+#park-ping .notification strong {display:block;margin-bottom:4px}
+#park-ping .note {margin-top:16px;color:var(--pp-muted);font-size:12px;line-height:1.5}
+#park-ping .demo {padding:14px;background:var(--pp-soft);border-radius:14px;margin-top:18px}
+#park-ping .demo p {font-size:12px;color:var(--pp-muted);margin:0 0 10px}
+#park-ping .empty {padding:25px 8px;color:var(--pp-muted);font-size:14px;line-height:1.6}
+#park-ping [hidden] {display:none!important}
+</style>
+<div class="phone">
+<div class="chrome"><span>13:14</span><span>Android concept · Sample data</span></div>
+<header><div class="brand"><i data-lucide="bell-ring" aria-hidden="true"></i>Park Ping</div><p class="sub">A shorter queue. Just around the corner.</p><select class="park" id="pp-park" aria-label="Park"><option>Magic Kingdom</option><option>EPCOT</option><option>Disneyland Paris</option></select></header>
+<main><section class="session"><div class="row"><div><strong id="pp-session-title">Park mode is on</strong><p class="sub" id="pp-session-sub">Nearby alerts · Location stays on your phone</p></div><button id="pp-pause" class="secondary" aria-pressed="false">Pause</button></div></section>
+<div id="pp-content"></div>
+<div id="pp-feedback" aria-live="polite"></div>
+</main>
+<nav aria-label="Main navigation"><button data-page="nearby" aria-pressed="true"><i data-lucide="navigation" aria-hidden="true"></i>Nearby</button><button data-page="favourites" aria-pressed="false"><i data-lucide="heart" aria-hidden="true"></i>Favourites</button><button data-page="alerts" aria-pressed="false"><i data-lucide="bell" aria-hidden="true"></i>My alerts</button></nav>
+</div>
+<script>
+(()=>{
+const root=document.getElementById('park-ping');
+const content=root.querySelector('#pp-content'),feedback=root.querySelector('#pp-feedback');
+const datasets={
+'Magic Kingdom':[{id:'space',name:'Space Mountain',area:'Tomorrowland',wait:35,distance:350,favourite:true},{id:'big',name:'Big Thunder Mountain',area:'Frontierland',wait:15,distance:650,favourite:true},{id:'pirates',name:'Pirates of the Caribbean',area:'Adventureland',wait:20,distance:850,favourite:false}],
+'EPCOT':[{id:'test',name:'Test Track',area:'World Discovery',wait:40,distance:350,favourite:true},{id:'soarin',name:'Soarin’ Around the World',area:'World Nature',wait:20,distance:650,favourite:true},{id:'remy',name:'Remy’s Ratatouille Adventure',area:'France',wait:55,distance:950,favourite:false}],
+'Disneyland Paris':[{id:'hyperspace',name:'Star Wars Hyperspace Mountain',area:'Discoveryland',wait:35,distance:350,favourite:true},{id:'paris-big',name:'Big Thunder Mountain',area:'Frontierland',wait:15,distance:650,favourite:true},{id:'paris-pirates',name:'Pirates of the Caribbean',area:'Adventureland',wait:20,distance:850,favourite:false}]
+};
+let park='Magic Kingdom',page='nearby',paused=false,editing=null;
+const rules={},ridden=new Set(),lastPing={};
+const rides=()=>datasets[park];
+const ruleFor=r=>rules[r.id]||{wait:20,radius:750,skip:true,reopen:true,cooldown:30};
+const icon=()=>{if(typeof lucide!=='undefined')lucide.createIcons();};
+const announce=t=>{feedback.innerHTML='<div class="notification">'+t+'</div>';};
+function cards(list){return list.map(r=>{const rule=ruleFor(r),match=r.wait<=rule.wait&&r.distance<=rule.radius&&!ridden.has(r.id);return '<article class="ride"><div class="ride-top"><div><h3>'+r.name+'</h3><p class="sub">'+r.area+' · '+r.distance+' m away</p></div><div class="wait">'+r.wait+'<span>min queue</span></div></div><span class="tag">'+(ridden.has(r.id)?'Ridden today':match?'Within your queue & distance limits':'Updated 2 min ago · Sample')+'</span><div class="actions"><button data-fav="'+r.id+'" aria-pressed="'+r.favourite+'">'+(r.favourite?'♥ Saved':'♡ Favourite')+'</button><button class="secondary" data-edit="'+r.id+'">'+(rules[r.id]?'Edit alert':'Set alert')+'</button></div><button class="full" style="margin-top:8px" data-ridden="'+r.id+'">'+(ridden.has(r.id)?'Undo ridden today':'Mark ridden today')+'</button></article>';}).join('');}
+function render(){feedback.innerHTML='';editing=null;
+root.querySelectorAll('nav button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.page===page)));
+if(page==='nearby')content.innerHTML='<h2>Near you</h2><p class="sub">Favourite rides with a short queue get priority.</p>'+cards([...rides()].sort((a,b)=>Number(b.favourite)-Number(a.favourite)||a.distance-b.distance));
+if(page==='favourites')content.innerHTML='<h2>Your favourites</h2>'+ (rides().some(r=>r.favourite)?cards(rides().filter(r=>r.favourite)):'<p class="empty">Save a ride from Nearby to keep it here.</p>');
+if(page==='alerts'){const active=rides().filter(r=>rules[r.id]);content.innerHTML='<h2>My alerts</h2><p class="sub">All conditions must match before you get a ping.</p>'+ (active.length?active.map(r=>{const q=rules[r.id];return '<article class="ride"><h3>'+r.name+'</h3><p class="sub">Queue ≤ '+q.wait+' min · Within '+q.radius+' m<br>'+(q.skip?'Skip if ridden today · ':'')+q.cooldown+' min cooldown</p><div class="actions"><button data-edit="'+r.id+'" class="secondary">Edit conditions</button><button data-remove="'+r.id+'">Remove</button></div></article>';}).join(''):'<p class="empty">Choose “Set alert” on a ride to create your first rule.</p>');}icon();}
+function edit(id){const r=rides().find(x=>x.id===id);if(!r)return;editing=id;feedback.innerHTML='';const q=ruleFor(r);content.innerHTML='<div class="row"><button id="pp-back">← Back</button><span class="sub">Alert conditions</span></div><div class="editor"><h2>'+r.name+'</h2><label class="field"><span class="row"><span>Maximum queue</span><strong id="pp-wait-value">'+q.wait+' minutes</strong></span><input id="pp-wait" type="range" min="5" max="90" step="5" value="'+q.wait+'"></label><label class="field"><span class="row"><span>Within this distance</span><strong id="pp-radius-value">'+q.radius+' m</strong></span><input id="pp-radius" type="range" min="100" max="2000" step="50" value="'+q.radius+'"></label><label class="check"><span>Only if I haven’t ridden it today</span><input id="pp-skip" type="checkbox" '+(q.skip?'checked':'')+'></label><label class="check"><span>Also alert when it reopens nearby</span><input id="pp-reopen" type="checkbox" '+(q.reopen?'checked':'')+'></label><label class="field"><span class="row"><span>Time between alerts</span></span><select id="pp-cooldown" class="park"><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option></select></label><button id="pp-save" class="primary full">Save alert</button><p class="note">Distance is straight-line distance, not walking time. Reopening alerts still respect distance, ridden status and cooldown.</p></div><div class="demo"><p>Try a sample event — no real GPS or notifications.</p><div class="actions"><button id="pp-simulate">Queue drops to 15 min</button><button id="pp-sim-reopen">Ride reopens</button></div><div class="actions"><button id="pp-move">Move within 250 m</button><button id="pp-reset-demo">Reset test</button></div></div>';
+root.querySelector('#pp-cooldown').value=String(q.cooldown);
+root.querySelector('#pp-wait').oninput=e=>root.querySelector('#pp-wait-value').textContent=e.target.value+' minutes';
+root.querySelector('#pp-radius').oninput=e=>root.querySelector('#pp-radius-value').textContent=e.target.value+' m';
+}
+function draft(){return {wait:Number(root.querySelector('#pp-wait').value),radius:Number(root.querySelector('#pp-radius').value),skip:root.querySelector('#pp-skip').checked,reopen:root.querySelector('#pp-reopen').checked,cooldown:Number(root.querySelector('#pp-cooldown').value)};}
+function simulate(reopening){const r=rides().find(x=>x.id===editing),q=draft();if(!reopening)r.wait=15;
+let reason=paused?'Park mode is paused.':reopening&&!q.reopen?'Reopening alerts are switched off.':r.distance>q.radius?'The ride is outside your distance limit.':q.skip&&ridden.has(r.id)?'You’ve already ridden this ride today.':!reopening&&r.wait>q.wait?'The queue is above your limit.':lastPing[r.id]&&Date.now()-lastPing[r.id]<q.cooldown*60000?'Your cooldown is preventing another notification.':null;
+if(reason)announce('<strong>No notification</strong>'+reason);else{lastPing[r.id]=Date.now();announce('<strong>Sample notification · Park Ping</strong>'+r.name+(reopening?' has reopened':' has a '+r.wait+' minute queue')+' — '+r.distance+' m away.');}}
+root.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+if(b.dataset.page){page=b.dataset.page;render();}
+if(b.dataset.edit)edit(b.dataset.edit);
+if(b.dataset.fav){const r=rides().find(x=>x.id===b.dataset.fav);r.favourite=!r.favourite;render();}
+if(b.dataset.ridden){const id=b.dataset.ridden;if(ridden.has(id))ridden.delete(id);else ridden.add(id);render();}
+if(b.dataset.remove){delete rules[b.dataset.remove];render();}
+if(b.id==='pp-back')render();
+if(b.id==='pp-save'){const id=editing;rules[id]=draft();rides().find(x=>x.id===id).favourite=true;page='alerts';render();announce('Alert saved. In this prototype, alerts run only when you simulate an event.');}
+if(b.id==='pp-simulate')simulate(false);
+if(b.id==='pp-sim-reopen')simulate(true);
+if(b.id==='pp-move'){rides().find(x=>x.id===editing).distance=250;announce('Sample location moved to 250 m from this ride. Try a queue drop or reopening.');}
+if(b.id==='pp-reset-demo'){delete lastPing[editing];announce('Test cooldown reset. You can simulate another notification.');}
+if(b.id==='pp-pause'){paused=!paused;b.textContent=paused?'Resume':'Pause';b.setAttribute('aria-pressed',String(paused));root.querySelector('#pp-session-title').textContent=paused?'Park mode is paused':'Park mode is on';root.querySelector('#pp-session-sub').textContent=paused?'No alerts until you resume':'Nearby alerts · Location stays on your phone';}
+});
+root.querySelector('#pp-park').onchange=e=>{park=e.target.value;render();};render();
+})();
+</script>
+</div>
+</body></html>

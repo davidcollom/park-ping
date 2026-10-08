@@ -1,0 +1,46 @@
+name: Organise Google Play launch
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/launch-milestone.yml']
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: park-ping-launch-milestone
+  cancel-in-progress: false
+
+jobs:
+  organise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const title = 'Google Play launch';
+            const milestones = await github.paginate(github.rest.issues.listMilestones, {
+              owner, repo, state: 'all', per_page: 100
+            });
+            let milestone = milestones.find(m => m.title === title);
+            if (!milestone) {
+              const result = await github.rest.issues.createMilestone({
+                owner, repo, title,
+                description: 'Prepare Park Ping for Google Play: original branding, real app screenshots, compatibility, privacy, signed AAB and device/closed testing. Tracked by issue #11. No launch date set.'
+              });
+              milestone = result.data;
+            }
+            for (const issue_number of [1,2,3,4,5,6,7,8,9,10,11]) {
+              const { data: issue } = await github.rest.issues.get({ owner, repo, issue_number });
+              if (!issue.milestone) {
+                await github.rest.issues.update({ owner, repo, issue_number, milestone: milestone.number });
+              } else if (issue.milestone.number !== milestone.number) {
+                core.warning(`Issue #${issue_number} already belongs to another milestone; left unchanged.`);
+              }
+            }
+            core.info(`Launch milestone: ${milestone.html_url}`);

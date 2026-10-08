@@ -1,111 +1,70 @@
-# Park Ping — Android MVP
+<p align="center"><img src="docs/images/park-ping-mascot.png" width="190" alt="Park Ping mascot: a smiling location-pin scout holding a park ticket"></p>
 
-Park Ping alerts you when a favourite ride nearby has a queue within your chosen limit or reopens. Native Android app with local location processing, configurable alert rules and live Disney/Universal park data.
+# Park Ping
 
-This is an early testing build, not a Play Store release.
+### A shorter queue. Just around the corner.
 
-## Install on your Android phone
+Spend more of your park day enjoying the rides. Park Ping watches your favourite attractions and lets you know when a nearby ride has a queue within your chosen limit, or reopens.
 
-1. Download an APK from [GitHub Releases](https://github.com/davidcollom/park-ping/releases). Tagged builds are also available as ZIP downloads in [GitHub Actions](https://github.com/davidcollom/park-ping/actions).
-2. Open the downloaded file. If Android asks, allow the app you used to open it (for example, Files or Chrome) to install this APK. This permission can be switched off afterwards.
-3. Open **Park Ping**, pick a park and wait for the live ride list.
-4. Tap **Set alert** on a ride. Set the maximum queue, distance, ridden filter, reopening alerts and cooldown. Save it.
-5. Tap **Start Park mode** while the app is open. Grant location and notification permissions. Precise location gives better nearby results.
-6. Stop monitoring with **Pause Park mode**, or **Stop Park mode** in the ongoing Android notification.
+**[Download the Android test app](https://github.com/davidcollom/park-ping/releases)** · **[Follow the Google Play launch](https://github.com/davidcollom/park-ping/issues/11)**
 
-At home, open an alert editor and tap **Send test notification**. Its notification is explicitly labelled as an example; it does not mean a real ride is nearby.
+Currently available as an early Android test build. Google Play publication is on the roadmap.
 
-## Implemented
+## Your park day, your rules
 
-- Native Nearby, Favourites and My alerts screens, with light and dark appearances.
-- Live standby waits and ride coordinates from the public ThemeParks.wiki API.
-- Magic Kingdom, EPCOT, Hollywood Studios, Animal Kingdom, both Disneyland Paris parks, Universal Studios Florida, Islands of Adventure and Epic Universe.
-- Per-ride queue thresholds, straight-line distance limits, optional ridden-today exclusion and reopening alerts.
-- Ridden state resets by the park's local date, rather than the phone's timezone.
-- Local persistence of favourites, rules and notification cooldowns.
-- User-started location foreground service with a persistent notification and stop action. No all-the-time location permission, automatic boot start, accounts or app backend.
-- Fetching approximately every two minutes; bounded network timeouts and additional retry backoff.
-- Missing waits are never interpreted as zero. Cached/offline feeds cannot trigger alerts.
-- Alerts require an operating ride, a feed timestamp within ten minutes, a location fix within two minutes and reported accuracy of 100 metres or better.
-- Threshold notifications on entering a matching state, with a persisted cooldown; no repeated alerts while a ride continuously qualifies.
-- Optional reopening notification after an observed DOWN → OPERATING transition. This respects distance, ridden filtering and cooldown, and can trigger above the queue threshold. A normal CLOSED → OPERATING opening does not count as a reopening.
-- Sessions stop after twelve hours; OS/service termination requires manually restarting Park mode.
+- **Choose your queue limit.** Set the longest posted wait you’re happy with for each ride.
+- **Stay nearby.** Pick a distance radius so your alerts fit where you are in the park.
+- **Save your favourites.** Keep the rides you care about together.
+- **Make room for something new.** Mark rides as done and optionally skip them for the rest of the day.
+- **Catch a reopening.** Get a ping after a nearby ride comes back from a temporary downtime.
+- **Set the pace.** Choose a cooldown between alerts, and pause Park mode whenever you like.
 
-## Validation and limitations
+Distances are measured in a straight line, rather than along park paths. Posted waits can change before you arrive.
 
-- Compiled all native app classes against Android API 35.
-- Passed 26 pure Java alert-decision checks, including stale data, invalid/missing waits, location accuracy, boundary conditions, cooldowns and reopening rules.
-- Packaged the APK with Android SDK Build Tools 35.0.0; aligned it and verified its APK v2/v3 signatures.
-- Inspected the public feed's live JSON contract and park identifiers while implementing the adapter.
-- **Not yet tested on a physical Android device or emulator.** Installation, screen layouts, permission flows, notification delivery and screen-off operation need device testing.
-- Gradle repository resolution was unavailable in the creation environment, so the supplied APK was produced with the included dependency-free SDK build script. Gradle lint has not run. The source includes a conventional Gradle project and a CI workflow for those checks.
-- Android power saving can delay polling or stop the service. No exact delivery interval is promised.
-- Queue times are posted estimates and can change before you arrive. `lastUpdated` is conservatively used for freshness; a provider retaining older timestamps for unchanged data can suppress otherwise useful alerts.
-- The UI keeps the previous successful snapshot when a refresh fails. Its age labels remain visible; the monitor never sends notifications from a cached snapshot.
-- Proximity is straight-line distance, not a park footpath route or walking-time estimate.
-- No map/navigation screen, push-notification backend, Play Store publication, automatic ride detection or cross-device sync in this version.
+## Take a look
 
-## CI and tagged APKs
+These screenshots are from the interactive design mock-up, using **sample data**. They show the intended experience; the native Android test build may look different. They are not final Play Store screenshots.
 
-Pushes and pull requests run the alert tests and build a development APK. Every pushed tag builds a versioned APK, verifies its signature, uploads an Actions artifact and attaches the APK and checksum to a GitHub Release.
+| Nearby rides | Your alert controls | A sample ping |
+| --- | --- | --- |
+| <img src="docs/images/mockup-nearby.png" width="260" alt="Design mock-up showing nearby rides with sample wait times"> | <img src="docs/images/mockup-alert-controls.png" width="260" alt="Design mock-up of queue, distance and cooldown controls"> | <img src="docs/images/mockup-notification.png" width="260" alt="Design mock-up showing an explicitly labelled sample notification"> |
 
-For example, push a version tag after committing your changes:
+The little location-pin scout above is our first mascot concept. Bringing it into the app and finishing the launcher/store icons is tracked in [#1](https://github.com/davidcollom/park-ping/issues/1).
 
-```bash
-git tag v0.1.1
-git push origin v0.1.1
-```
+## Try it on your phone
 
-Tag releases are testing builds by default. Without a stable signing keystore configured, builds can have different signing certificates and Android may require uninstalling the previous version before installing the new one; uninstalling removes locally saved rules and favourites. Configure all four repository Actions secrets below before distributing builds that need reliable in-place updates. Never commit a private release signing key.
+1. Download **park-ping.apk** from a [signed test release](https://github.com/davidcollom/park-ping/releases).
+2. Open it on your Android phone. If prompted, allow Files or your browser to install it.
+3. Pick a park, choose a ride and save your alert conditions.
+4. Tap **Start Park mode** and allow location and notifications.
+5. Pause from the app, or stop Park mode from its ongoing notification.
 
-| Optional Actions secret | Value |
-| --- | --- |
-| `PARKPING_KEYSTORE_BASE64` | Base64-encoded contents of a persistent signing keystore |
-| `PARKPING_KEYSTORE_PASSWORD` | Keystore password |
-| `PARKPING_KEY_ALIAS` | Signing key alias |
-| `PARKPING_KEY_PASSWORD` | Key password |
+You can try **Send test notification** at home. It’s labelled as an example and does not mean a ride is nearby. Park Ping supports Android 8.0 and later.
 
-Configure all four together under Settings → Secrets and variables → Actions. Builds without them publish `park-ping-development.apk`; builds with them publish `park-ping.apk`. Tag names become the APK version name; CI assigns an increasing Android version code. Releases are marked as prereleases while phone testing is outstanding.
+If you installed the original development-key build, switching to the signed release requires uninstalling that build first, which removes its saved settings. Updates signed with the same release key can preserve your settings.
 
-For key creation and exact upload commands, see [SIGNING.md](SIGNING.md).
+## Parks you can explore
 
-## Build and maintain
+**Walt Disney World:** Magic Kingdom, EPCOT, Hollywood Studios and Animal Kingdom.
 
-Java 17 and Android Studio / Android SDK are required. Application ID: `uk.co.collom.parkping`. Minimum Android version: Android 8.0 (API 26); target/compile SDK: 35.
+**Disneyland Paris:** Disneyland Park and Walt Disney Studios Park (the name shown in this test build).
 
-Standard build:
+**Universal Orlando:** Universal Studios Florida, Islands of Adventure and Epic Universe.
 
-```bash
-./test.sh
-./gradlew assembleDebug lintDebug
-```
+Availability and wait times depend on the live data feed.
 
-If a wrapper is not available, install Gradle 8.11.1 and run `gradle assembleDebug lintDebug`. Open the project folder in Android Studio to manage SDK setup and run on a connected device.
+## Location stays on your phone
 
-SDK-only fallback (Python 3 is used only for resource packaging):
+Park Ping uses your location on your device to calculate ride distances. It does not send your coordinates to the park-data provider. The app has no account system or analytics SDKs.
 
-```bash
-export JAVA_HOME=/path/to/jdk-17
-export ANDROID_HOME=/path/to/android-sdk
-./test.sh
-./build-apk.sh
-```
+Live data requests use park IDs and expose normal network information such as your IP address. Monitoring starts when you switch on Park mode, with an ongoing notification and a stop control. Android battery settings may delay checks or stop monitoring.
 
-Install SDK platform `android-35` and Build Tools `35.0.0` first. The fallback generates a development signing key in `.local-signing/` (git-ignored); keep the key to produce installable updates with the same signature. Production releases require a separate release signing setup. The generated output is `app/build/manual/park-ping-0.1.0.apk`.
+## Help shape the first release
 
-Code structure:
+Found a problem? [Open an issue](https://github.com/davidcollom/park-ping/issues/new) with your app version, Android version, selected park and what happened. Please keep passwords and signing keys private.
 
-| File | Purpose |
-| --- | --- |
-| `MainActivity.java` | Native screens, alert editor and permission flows |
-| `MonitorService.java` | Park session, fresh location checks and notifications |
-| `AlertEngine.java` | Pure, independently testable alert decisions and distance calculation |
-| `ParkApi.java` | HTTPS adapter, entity/live joins and offline cache |
-| `Store.java` | Local rules, favourites, daily ride markers and cooldowns |
-| `Models.java` | Ride models and supported parks |
+The [Google Play launch tracker](https://github.com/davidcollom/park-ping/issues/11) covers the mascot, real app screenshots, accessibility, device testing, privacy information and release preparation. Store copy is drafted in [docs/STORE-LISTING.md](docs/STORE-LISTING.md).
 
-## Privacy and data
+For building or maintaining the app, see [the developer guide](docs/DEVELOPING.md) and [the signing guide](SIGNING.md).
 
-Location is only used locally to calculate ride distances; coordinates are not sent to the data provider. Network requests contain park IDs and normal network metadata such as your IP address. No analytics or third-party tracking SDKs are included. Local preferences and cached feeds are excluded from Android backup. The Android permission prompt and Park mode explanation precede active location monitoring.
-
-Ride data: https://themeparks.wiki — please retain attribution. This is an unofficial app and is not affiliated with Disney, Universal or ThemeParks.wiki. Review the provider's current terms before public/commercial distribution.
+Ride data is provided by [ThemeParks.wiki](https://themeparks.wiki). Park Ping is an independent app, unaffiliated with Disney, Universal or ThemeParks.wiki.
