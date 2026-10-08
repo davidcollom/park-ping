@@ -166,7 +166,7 @@ jobs:
           )
       - uses: actions/upload-artifact@v4
         with:
-          name: park-ping-tagged-build-${{ github.run_number }}
+          name: park-ping-tagged-apk-${{ github.run_number }}
           path: |
             dist/release/*
             dist/artifact/*
