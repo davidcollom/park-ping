@@ -67,4 +67,4 @@ The [Google Play launch tracker](https://github.com/davidcollom/park-ping/issues
 
 For building or maintaining the app, see [the developer guide](docs/DEVELOPING.md) and [the signing guide](SIGNING.md).
 
-Ride data is provided by [ThemeParks.wiki](https://themeparks.wiki). Park Ping is an independent app, unaffiliated with Disney, Universal or ThemeParks.wiki.
+Ride data is provided by [ThemeParks.wiki](https://themeparks.wiki). Park Ping is an independent app, unaffiliated with Disney, Universal or ThemeParks.wiki. See the [live-data and branding review](docs/DATA-AND-BRAND-REVIEW.md) before public distribution.

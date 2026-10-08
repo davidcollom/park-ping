@@ -232,7 +232,7 @@ public final class MainActivity extends Activity {
         if (page.equals("Nearby") && MonitorService.latestLocation == null) content.addView(note("Start Park mode for nearby distances. You can set alerts first."));
         for (Models.Ride r : visible) rideCard(r);
         addGap(content, 16);
-        TextView attribution = note("Data: ThemeParks.wiki ↗ · Unofficial app, not affiliated with Disney or Universal.");
+        TextView attribution = note("Data: ThemeParks.wiki ↗ · Independent, unofficial app; not affiliated with Disney, Universal or ThemeParks.wiki.");
         attribution.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://themeparks.wiki")))); content.addView(attribution);
     }
     private void rideCard(Models.Ride r) {

@@ -32,6 +32,7 @@ Park Ping is an independent app and is not affiliated with Disney, Universal or 
 - Finish adaptive icons and Play graphics: issue #1.
 - Add the actual support contact and published privacy-policy URL: issues #5 and #10.
 - Verify descriptions against shipping behaviour, park names and current Console limits.
+- Resolve the live-data distribution gate in [the data and branding review](DATA-AND-BRAND-REVIEW.md) before public release.
 - Complete compatibility, signed AAB and Play testing work: issues #3, #4, #6 and #9.
 
 See [the launch tracker](https://github.com/davidcollom/park-ping/issues/11). No Play listing has been published.

@@ -95,4 +95,4 @@ Code structure:
 
 Location is only used locally to calculate ride distances; coordinates are not sent to the data provider. Network requests contain park IDs and normal network metadata such as your IP address. No analytics or third-party tracking SDKs are included. Local preferences and cached feeds are excluded from Android backup. The Android permission prompt and Park mode explanation precede active location monitoring.
 
-Ride data: https://themeparks.wiki — please retain attribution. This is an unofficial app and is not affiliated with Disney, Universal or ThemeParks.wiki. Review the provider's current terms before public/commercial distribution.
+Ride data comes from [ThemeParks.wiki](https://themeparks.wiki). The [live-data and branding review](DATA-AND-BRAND-REVIEW.md) records the current attribution, polling, outage, and distribution findings.
