@@ -4,6 +4,8 @@
 
 **Physical-device testing is outstanding.** `adb` is not installed in the environment where this record was prepared, so the APK could not be installed on or tested with a physical device. The procedures below are not results: do not treat any device-dependent behavior as verified until the result fields are completed on a real device.
 
+Contributes to #6. Keep issue #6 open until reproducible physical-device results and remaining limitations are recorded; this documentation alone does not complete its acceptance work.
+
 The implementation and automated checks provide expected behavior, not proof of Android OS or device behavior. In particular, the app uses a user-started location foreground service, polls about every two minutes, stops after 12 hours, and does not restart automatically after OS/service termination. Alerts are suppressed for cached feeds, queue data older than 10 minutes, location fixes older than two minutes, or reported accuracy worse than 100 metres. Distances are straight-line. Ridden-today state uses the selected park's timezone.
 
 ## Record each test run
@@ -20,7 +22,19 @@ Complete this information for every device/build tested:
 | Selected park and local timezone | Not run |
 | Network and location conditions | Not run |
 
-For APK identity, use `sha256sum park-ping.apk` and `apksigner verify --print-certs park-ping.apk`. Keep signing keys and passwords private; record only the certificate fingerprint.
+For APK identity, use `sha256sum park-ping.apk` (Linux) or `shasum -a 256 park-ping.apk` (macOS), and `apksigner verify --print-certs park-ping.apk`. Keep signing keys and passwords private; record only the certificate fingerprint.
+
+## Prerequisite for injected scenarios
+
+This repository does not include an on-device fixture harness or a configurable provider endpoint. Network disable/reconnect can be tested against the normal APK, but deterministic provider failures, missing/stale data, and reopening transitions require a separately prepared, reproducible test build/harness. Until that prerequisite is available, leave those injected cases **Not run**; do not substitute the home sample notification button. That button sends sample data directly and does not exercise `ParkApi.load`, `MonitorService.poll`, or `AlertEngine.evaluate`.
+
+The harness must supply controlled responses at the provider boundary while retaining the real parsing, cache fallback, polling, alert evaluation, and Android notification path. Do not call the notification API directly or weaken the release APK's HTTPS checks. Record the harness source revision, setup/run/reset commands, test APK identity, fixture files and SHA-256 hashes, response order and timing, and initial cache/rule/cooldown state so another tester can repeat the case. Clearly label results from this test build separately from results on the unmodified release APK.
+
+Use matching ride IDs in `/entity/{parkId}/children` and `/entity/{parkId}/live` fixtures. Include ride coordinates in `children`, and `entityType: ATTRACTION`, `status`, `queue.STANDBY.waitTime`, and `lastUpdated` in `liveData`. Keep location fresh, accurate, and within the configured radius, and keep ridden/cooldown state eligible except when testing those gates. For each case, reset state and record the exact response sequence:
+
+- **Offline/reconnect and provider failure:** Seed a successful response/cache, fail subsequent requests (record whether transport failure or a specified non-200 HTTP response), then restore success. Repeat from an empty provider cache without clearing saved rules; verify fallback, alert suppression, and recovery.
+- **Missing/stale data:** Disable reopening alerts to isolate threshold eligibility. Return separate otherwise-eligible fixtures with `waitTime` null or absent, `lastUpdated` absent, and `lastUpdated` more than 10 minutes before the device clock. Record the device clock and generated timestamps; then return fresh data to check recovery.
+- **Reopening:** With reopening enabled, wait for a poll to consume fresh `DOWN` data, then return fresh `OPERATING` data for the same ride. Reset state and repeat with `CLOSED` → `OPERATING` as the negative control. Keep the wait above the configured threshold so a threshold crossing cannot be mistaken for a reopening alert.
 
 ## Test procedures and results
 
@@ -36,10 +50,10 @@ For every row, record **Pass**, **Fail**, or **Not run**, along with the device/
 | Process/service termination and stop action | While monitoring, use the notification's **Stop Park mode** action and verify monitoring stops and the ongoing notification is removed. Separately, reproduce an OS/process termination without force-stopping the package; verify whether monitoring ends and that it does not restart automatically. Force-stop only as a separately labelled case because Android may block background starts until the app is opened again. | Not run |
 | Twelve-hour limit | Leave Park mode active for a full 12-hour session with the screen on/off as practical. Verify the session ends, the status reports the 12-hour limit, and the ongoing notification is removed. Record interruptions or device reboots. | Not run |
 | Battery consumption | Run a representative park session of at least two hours with the screen off for most of it. Record start/end time, battery percentage and (if available) Android's per-app energy/charge usage, plus location mode, signal, and battery saver settings. Compare with a similar-duration idle baseline on the same device; report the method and avoid treating percentage change as precise app-only consumption. | Not run |
-| Offline, reconnect, missing/stale data, provider failure | Load a park online, then disable network access. Verify cached data is labelled and cannot trigger alerts; restore connectivity and verify live updates resume. Repeat with no cache, an unavailable provider, missing queue values, missing timestamps, and data older than 10 minutes when reproducibly available. Record status, retry/recovery time, and any crash. | Not run |
+| Offline, reconnect, missing/stale data, provider failure | Load a park online, then disable network access. Verify cached data is labelled and cannot trigger alerts; restore connectivity and verify live updates resume. For controlled failures and missing/stale data, use the fixture prerequisite and response sequences above, including the no-cache case. Record status, retry/recovery time, and any crash; leave injected cases Not run if the harness is unavailable. | Not run |
 | Cooldown and duplicate alerts | Configure a ride with a short cooldown and observe a real qualifying queue transition. Verify only one threshold alert is sent while it remains eligible, a continuously qualifying ride does not repeatedly alert, and another alert is possible only after the configured cooldown and a new qualifying transition. Record notification timestamps. | Not run |
 | Ridden-today timezone rollover | Mark a ride ridden with skip-ridden enabled. Verify it is excluded for the selected park's local date, remains excluded across phone timezone changes that do not change the park date, and becomes eligible after the park-local date changes. Record the park, its timezone, local timestamps, and result. | Not run |
-| Reopening rules | Enable reopening alerts. Observe or reproduce a `DOWN` → `OPERATING` transition and verify one eligible alert, subject to distance, freshness, ridden state, and cooldown. Verify a normal `CLOSED` → `OPERATING` opening does not count as a reopening. | Not run |
+| Reopening rules | Enable reopening alerts. Observe a real `DOWN` → `OPERATING` transition or use the fixture prerequisite and response sequence above; verify one eligible alert, subject to distance, freshness, ridden state, and cooldown. Verify a normal `CLOSED` → `OPERATING` opening does not count as a reopening. Leave injected cases Not run if the harness is unavailable. | Not run |
 
 ## Results available in this repository
 
