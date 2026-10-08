@@ -20,12 +20,13 @@ Technical reference for contributors. For the visitor-facing overview, see [the 
 
 ## Validation and limitations
 
-- Compiled all native app classes against Android API 35.
-- Passed 26 pure Java alert-decision checks, including stale data, invalid/missing waits, location accuracy, boundary conditions, cooldowns and reopening rules.
-- Packaged the APK with Android SDK Build Tools 35.0.0; aligned it and verified its APK v2/v3 signatures.
+- `./test.sh` passed 26 pure Java alert-decision checks, including stale data, invalid/missing waits, location accuracy, boundary conditions, cooldowns and reopening rules.
+- `./build-apk.sh` built against Android API 36 and Build Tools 36.0.0; `apksigner` verified the APK's v2 and v3 signatures.
+- Local Gradle lint, debug build and AAB build have not been verified: this environment could not resolve Android Gradle Plugin 8.10.1 from its configured repositories.
+- Pull-request CI is configured to run Gradle lint/debug build, then build a release AAB with a disposable job-generated test key, validate it with bundletool, verify its JAR signature and publish a smoke-test artifact. The disposable key is not a Play upload key; that workflow run has not yet been verified.
 - Inspected the public feed's live JSON contract and park identifiers while implementing the adapter.
-- **Not yet tested on a physical Android device or emulator.** Installation, screen layouts, permission flows, notification delivery and screen-off operation need device testing.
-- Gradle repository resolution was unavailable in the creation environment, so the supplied APK was produced with the included dependency-free SDK build script. Gradle lint has not run. The source includes a conventional Gradle project. Current CI runs the Java rule checks and SDK-only APK build; Gradle lint is launch work tracked in issue #3.
+- **Not yet tested on a physical Android device.** Installation, screen layouts, permission flows, notification delivery and screen-off operation need device testing on Android 13, 15 and 16.
+- On trusted tagged releases with Play upload-key secrets configured, CI is configured to validate the signed AAB, generate and verify an upload-key-signed universal APK, and install/launch it on an Android API 36 emulator. That emulated APK does not verify the Google Play app-signing certificate or Play-delivered update path; this remains pending.
 - Android power saving can delay polling or stop the service. No exact delivery interval is promised.
 - Queue times are posted estimates and can change before you arrive. `lastUpdated` is conservatively used for freshness; a provider retaining older timestamps for unchanged data can suppress otherwise useful alerts.
 - The UI keeps the previous successful snapshot when a refresh fails. Its age labels remain visible; the monitor never sends notifications from a cached snapshot.
@@ -56,11 +57,11 @@ Configure all four together under Settings → Secrets and variables → Actions
 
 Configure the separate `PARKPING_UPLOAD_*` secrets documented in [SIGNING.md](../SIGNING.md) to sign the AAB for Play Console. The Play upload key is not the app signing key: Google Play App Signing uses a Google-managed app signing key for Play installs. GitHub APKs use a separate certificate, so switching between GitHub APKs and Play installs requires uninstalling; only updates within the same channel are compatible. The same tag workflow supplies both formats with `versionCode = 1000 + GitHub Actions run_number`; keep all Play tracks on that sequence and do not upload a higher code manually. Releases remain prereleases while phone testing is outstanding.
 
-With upload secrets configured, CI validates the signed AAB, builds a universal APK with bundletool, and installs/launches it on an Android API 35 emulator. Download the generated `park-ping-play-universal.apk` Actions artifact for optional physical-device checks. Then upload `park-ping-play.aab` to the Play internal testing track, install from Play, and verify a subsequent tagged release updates in place while preserving app state. The universal APK is upload-key-signed and does not test Play's app-signing certificate/update path. Play Console enrollment, track acceptance, and physical-device checks require maintainer access and are not performed by CI.
+With upload secrets configured, tagged CI validates the signed AAB, builds a universal APK with bundletool, and installs/launches it on an Android API 36 emulator. Download the generated `park-ping-play-universal.apk` Actions artifact for optional physical-device checks. Then upload `park-ping-play.aab` to the Play internal testing track, install from Play, and verify a subsequent tagged release updates in place while preserving app state. The universal APK is upload-key-signed and does not test Play's app-signing certificate/update path. Play Console enrollment, track acceptance, and physical-device checks require maintainer access and are not performed by CI.
 
 ## Build and maintain
 
-Java 17 and Android Studio / Android SDK are required. Application ID: `uk.co.collom.parkping`. Minimum Android version: Android 8.0 (API 26); target/compile SDK: 35.
+Java 17 and Android Studio / Android SDK are required. Application ID: `uk.co.collom.parkping`. Minimum Android version: Android 8.0 (API 26); target/compile SDK: 36; Android Gradle Plugin: 8.10.1; Build Tools: 36.0.0.
 
 Standard local build and unsigned release bundle:
 
@@ -83,7 +84,7 @@ export ANDROID_HOME=/path/to/android-sdk
 ./build-apk.sh
 ```
 
-Install SDK platform `android-35` and Build Tools `35.0.0` first. The fallback generates a development signing key in `.local-signing/` (git-ignored); keep the key to produce installable updates with the same signature. Production releases require a separate release signing setup. The generated output is `app/build/manual/park-ping-0.1.0.apk`.
+Install SDK platform `android-36` and Build Tools `36.0.0` first. The fallback generates a development signing key in `.local-signing/` (git-ignored); keep the key to produce installable updates with the same signature. Production releases require a separate release signing setup. The generated output is `app/build/manual/park-ping-0.1.0.apk`.
 
 Code structure:
 
