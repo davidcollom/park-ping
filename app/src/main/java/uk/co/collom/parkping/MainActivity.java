@@ -93,6 +93,10 @@ public final class MainActivity extends Activity {
         setContentView(screen);
         screen.addView(text("Park Ping", 28, true));
         screen.addView(note("A shorter queue. Just around the corner.")); addGap(screen, 8);
+        TextView support = note("Help or report a problem ↗"); support.setTextColor(purple);
+        support.setOnClickListener(v -> startActivity(new Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://github.com/davidcollom/park-ping/issues/new/choose"))));
+        screen.addView(support);
         Spinner parks = new Spinner(this);
         ArrayAdapter<Models.Park> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, Models.PARKS);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); parks.setAdapter(adapter); parks.setSelection(store.parkIndex());

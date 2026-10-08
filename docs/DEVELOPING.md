@@ -96,3 +96,11 @@ Code structure:
 Location is only used locally to calculate ride distances; coordinates are not sent to the data provider. Network requests contain park IDs and normal network metadata such as your IP address. No analytics or third-party tracking SDKs are included. Local preferences and cached feeds are excluded from Android backup. The Android permission prompt and Park mode explanation precede active location monitoring.
 
 Ride data: https://themeparks.wiki — please retain attribution. This is an unofficial app and is not affiliated with Disney, Universal or ThemeParks.wiki. Review the provider's current terms before public/commercial distribution.
+
+## Support and report triage
+
+Visitors can reach the public [bug report and feature request forms](https://github.com/davidcollom/park-ping/issues/new/choose) from the app, README and listing draft. GitHub issues are public. Ask for app and Android versions, selected park, a timestamp and the expected behaviour, but never request signing secrets, precise location history or unnecessary personal details.
+
+During testing, review new reports at least weekly and before preparing a test release. Confirm the affected versions and park, reproduce against the current test build where possible, link duplicates, and prioritize crashes, incorrect alerts, data loss and privacy concerns before usability issues and feature requests.
+
+After launch, continue reviewing reports at least weekly. Check confirmed bugs against the current supported release, prioritize safety, privacy, data-loss and core alert failures, and use feature requests to inform the roadmap. Keep the report open if more information is needed; close it with a brief explanation when fixed, declined or no longer reproducible. The project does not promise an individual response time.

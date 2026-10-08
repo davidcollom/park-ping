@@ -24,13 +24,15 @@ Your location is processed on your phone to calculate ride distances. Coordinate
 
 Queue times are posted estimates and can change. Distance is a straight-line radius, not a walking route. Notifications need fresh data, location access and notification permission; Android battery settings can affect delivery.
 
+Need help or want to report a problem? [Contact Park Ping on GitHub](https://github.com/davidcollom/park-ping/issues/new/choose). Reports are public; don’t include passwords, signing keys, precise location history or unnecessary personal information.
+
 Park Ping is an independent app and is not affiliated with Disney, Universal or ThemeParks.wiki.
 
 ## Before this goes live
 
 - Replace concept images with verified screenshots of the native release candidate: issue #2.
 - Finish adaptive icons and Play graphics: issue #1.
-- Add the actual support contact and published privacy-policy URL: issues #5 and #10.
+- Publish the privacy-policy URL: issue #5. The public support route is the [GitHub issue forms](https://github.com/davidcollom/park-ping/issues/new/choose).
 - Verify descriptions against shipping behaviour, park names and current Console limits.
 - Complete compatibility, signed AAB and Play testing work: issues #3, #4, #6 and #9.
 

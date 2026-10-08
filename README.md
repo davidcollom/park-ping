@@ -61,7 +61,7 @@ Live data requests use park IDs and expose normal network information such as yo
 
 ## Help shape the first release
 
-Found a problem? [Open an issue](https://github.com/davidcollom/park-ping/issues/new) with your app version, Android version, selected park and what happened. Please keep passwords and signing keys private.
+Need help or found a problem? [Contact Park Ping through GitHub](https://github.com/davidcollom/park-ping/issues/new/choose) and choose a bug report or feature request. Include your app and Android versions, selected park, when it happened and what you expected. Reports are public, so don’t include passwords, signing keys, precise location history or other personal information.
 
 The [Google Play launch tracker](https://github.com/davidcollom/park-ping/issues/11) covers the mascot, real app screenshots, accessibility, device testing, privacy information and release preparation. Store copy is drafted in [docs/STORE-LISTING.md](docs/STORE-LISTING.md).
 

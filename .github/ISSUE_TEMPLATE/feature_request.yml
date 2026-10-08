@@ -1,0 +1,55 @@
+name: Feature request
+description: Suggest an improvement to Park Ping.
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Reports are public. Do not include passwords, signing keys, precise location history, or unnecessary personal information.
+  - type: input
+    id: app-version
+    attributes:
+      label: Park Ping app version
+      description: Find this in the release name or app listing.
+      placeholder: 0.1.0
+    validations:
+      required: true
+  - type: input
+    id: android-version
+    attributes:
+      label: Android version
+      description: Find it in your phone's Settings under About phone.
+      placeholder: Android 15
+    validations:
+      required: true
+  - type: dropdown
+    id: park
+    attributes:
+      label: Selected park
+      options:
+        - Magic Kingdom
+        - EPCOT
+        - Hollywood Studios
+        - Animal Kingdom
+        - Disneyland Paris
+        - Disney Adventure World
+        - Universal Studios Florida
+        - Islands of Adventure
+        - Epic Universe
+        - Not applicable / other
+    validations:
+      required: true
+  - type: input
+    id: timestamp
+    attributes:
+      label: When did you encounter this need?
+      description: Date, time and timezone if applicable; enter N/A if it is not tied to a particular moment.
+    validations:
+      required: false
+  - type: textarea
+    id: expected
+    attributes:
+      label: What would you like Park Ping to do?
+      description: Describe the behaviour you expect and how it would help.
+    validations:
+      required: true
