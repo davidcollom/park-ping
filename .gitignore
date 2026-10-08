@@ -6,3 +6,6 @@ local.properties
 *.keystore
 .idea/
 .local-signing/
+
+*.p12
+park-ping-release.base64

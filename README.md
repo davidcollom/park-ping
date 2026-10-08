@@ -67,6 +67,8 @@ Tag releases are testing builds by default. Without a stable signing keystore co
 
 Configure all four together under Settings → Secrets and variables → Actions. Builds without them publish `park-ping-development.apk`; builds with them publish `park-ping.apk`. Tag names become the APK version name; CI assigns an increasing Android version code. Releases are marked as prereleases while phone testing is outstanding.
 
+For key creation and exact upload commands, see [SIGNING.md](SIGNING.md).
+
 ## Build and maintain
 
 Java 17 and Android Studio / Android SDK are required. Application ID: `uk.co.collom.parkping`. Minimum Android version: Android 8.0 (API 26); target/compile SDK: 35.
