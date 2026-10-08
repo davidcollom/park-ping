@@ -15,6 +15,7 @@ final class ParkApi {
     record Snapshot(List<Models.Ride> rides, boolean cached, String message) { }
     private static final Object REQUEST_LOCK = new Object();
     private static final ProviderRequestGate THROTTLE = new ProviderRequestGate();
+    private static final SuccessfulSnapshotCache<Snapshot> SUCCESSFUL = new SuccessfulSnapshotCache<>();
     private final File directory;
     ParkApi(Context context) { directory = new File(context.getCacheDir(), "park-data"); directory.mkdirs(); }
     Snapshot load(Models.Park park) throws Exception {
@@ -29,11 +30,14 @@ final class ParkApi {
             JSONObject live = readRecent(liveFile, now);
             long delay = THROTTLE.delayMillis(park.id(), now);
             if (delay > 0) {
+                Snapshot shared = SUCCESSFUL.get(park.id(), now, THROTTLE.retryAfterAt());
+                if (shared != null) return shared;
                 if (children == null || live == null) throw new IOException("Park feed refresh is rate limited");
                 return snapshot(children, live, true, "Refresh limited — showing cached data; alerts paused");
             }
 
             THROTTLE.recordRequest(park.id(), now);
+            SUCCESSFUL.invalidate(park.id());
             persistThrottle(park.id(), lastRequest, retryAfter);
             try {
                 boolean metadataFresh = children != null;
@@ -52,7 +56,9 @@ final class ParkApi {
                 THROTTLE.recordRequest(park.id(), System.currentTimeMillis());
                 THROTTLE.recordSuccess();
                 persistThrottle(park.id(), lastRequest, retryAfter);
-                return snapshot(children, live, false, "Live feed refreshed");
+                Snapshot refreshed = snapshot(children, live, false, "Live feed refreshed");
+                SUCCESSFUL.remember(park.id(), refreshed, System.currentTimeMillis());
+                return refreshed;
             } catch (RateLimitException e) {
                 long responseTime = System.currentTimeMillis();
                 THROTTLE.rateLimited(e.retryAfter, responseTime);

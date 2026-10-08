@@ -24,6 +24,7 @@ public final class MonitorService extends Service implements LocationListener {
     private final Map<String, String> previousStatus = new HashMap<>();
     private long started;
     private int failures;
+    private boolean destroyed;
     private final Handler main = new Handler(Looper.getMainLooper());
     private Models.Park monitoredPark;
     static void channels(Context c) {
@@ -146,7 +147,12 @@ public final class MonitorService extends Service implements LocationListener {
         }
     }
     private void updateSessionNotification() {
-        getSystemService(NotificationManager.class).notify(1, sessionNotification(status));
+        // Serialize with onDestroy so a completed poll cannot recreate a stopped session.
+        main.post(() -> {
+            if (!destroyed && active && notificationsAllowed(this)) {
+                getSystemService(NotificationManager.class).notify(1, sessionNotification(status));
+            }
+        });
     }
     @Override public void onLocationChanged(android.location.Location location) { latestLocation = new android.location.Location(location); }
     @Override public void onProviderEnabled(String provider) { }
@@ -154,6 +160,8 @@ public final class MonitorService extends Service implements LocationListener {
     @Override public void onStatusChanged(String provider, int status, Bundle extras) { }
     @Override public IBinder onBind(Intent intent) { return null; }
     @Override public void onDestroy() {
+        destroyed = true;
+        main.removeCallbacksAndMessages(null);
         active = false; latestLocation = null;
         if (executor != null) executor.shutdownNow();
         if (locations != null) locations.removeUpdates(this);

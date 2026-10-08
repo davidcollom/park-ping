@@ -29,7 +29,7 @@ Technical reference for contributors. For the visitor-facing overview, see [the 
 - On trusted tagged releases with Play upload-key secrets configured, CI is configured to validate the signed AAB, generate and verify an upload-key-signed universal APK, and install/launch it on an Android API 36 emulator. That emulated APK does not verify the Google Play app-signing certificate or Play-delivered update path; this remains pending.
 - Android power saving can delay polling or stop the service. No exact delivery interval is promised.
 - Queue times are posted estimates and can change before you arrive. `lastUpdated` is conservatively used for freshness; a provider retaining older timestamps for unchanged data can suppress otherwise useful alerts.
-- The UI can retain the already displayed snapshot when refresh fails. Provider files expire after five minutes; an empty or expired cache cannot supply a fallback. The monitor never sends alerts from cached snapshots. Normal refresh cadence is per park; HTTP 429 backoff is shared.
+- The UI can retain the already displayed snapshot when refresh fails. Provider files expire after five minutes; an empty or expired cache cannot supply a fallback. The monitor never sends alerts from disk or failed-request fallback snapshots. Normal refresh cadence is per park; HTTP 429 backoff is shared.
 - Proximity is straight-line distance, not a park footpath route or walking-time estimate.
 - No map/navigation screen, push-notification backend, Play Store publication, automatic ride detection or cross-device sync in this version.
 
@@ -110,3 +110,7 @@ Visitors can reach the public [bug report and feature request forms](https://git
 During testing, review new reports at least weekly and before preparing a test release. Confirm the affected versions and park, reproduce against the current test build where possible, link duplicates, and prioritise crashes, incorrect alerts, data loss and privacy concerns before usability issues and feature requests.
 
 After launch, continue reviewing reports at least weekly. Check confirmed bugs against the current supported release, prioritise safety, privacy, data-loss and core alert failures, and use feature requests to inform the roadmap. Keep the report open if more information is needed; close it with a brief explanation when fixed, declined or no longer reproducible. The project does not promise an individual response time.
+
+The combined suite also includes 10 provider-throttle and eight per-park/shared-backoff checks. Full Android packaging and signed-bundle validation are required on the final PR head; local pure-Java results alone are not release evidence.
+
+A successful online snapshot can be shared between browsing and monitoring for under five minutes, retaining provider timestamps. Sharing does not convert a disk/offline fallback into live data. Eight response-sharing regression checks cover monitor starvation, expiry, rate limits and invalidation.
