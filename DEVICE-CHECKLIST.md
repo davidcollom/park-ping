@@ -11,5 +11,7 @@
 - Leave the screen off for at least ten minutes and observe notification/foreground-service behaviour under your phone's battery settings.
 - Disable network access and verify stale/cached labels and suppression of real alerts.
 - Test increased Android font size and both light/dark appearances for clipping.
+- CI installs and launches `park-ping-play-universal.apk` on an Android API 35 emulator. Install the artifact on a physical clean device too; verify launch and basic browsing. This upload-key-signed APK does not test updates to a Play-delivered installation.
+- Enrol in Play App Signing, upload `park-ping-play.aab` to internal testing and install from Play. Publish a later tagged AAB and verify that the Play installation updates in place and retains favourites and alert settings.
 
-Physical device checks have not yet been performed for version 0.1.0.
+Physical device checks, Play internal-track acceptance, and Play-to-Play update checks are pending for version 0.1.0.

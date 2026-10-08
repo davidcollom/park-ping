@@ -1,8 +1,38 @@
 plugins { id 'com.android.application' }
+def releaseVersionCode = (System.getenv('PARKPING_VERSION_CODE') ?: '1').toInteger()
+def releaseVersionName = System.getenv('PARKPING_VERSION_NAME') ?: '0.1.0'
+def uploadSigningValues = [
+    System.getenv('PARKPING_UPLOAD_KEYSTORE_FILE'),
+    System.getenv('PARKPING_UPLOAD_KEYSTORE_PASSWORD'),
+    System.getenv('PARKPING_UPLOAD_KEY_ALIAS'),
+    System.getenv('PARKPING_UPLOAD_KEY_PASSWORD')
+]
+def hasUploadSigning = uploadSigningValues.any { it }
+if (releaseVersionCode < 1 || releaseVersionCode > 2100000000) {
+    throw new GradleException('PARKPING_VERSION_CODE must be an Android-compatible positive integer.')
+}
+if (hasUploadSigning && uploadSigningValues.any { !it }) {
+    throw new GradleException('All four PARKPING_UPLOAD signing values are required when signing is configured.')
+}
 android {
     namespace 'uk.co.collom.parkping'
     compileSdk 35
-    defaultConfig { applicationId 'uk.co.collom.parkping'; minSdk 26; targetSdk 35; versionCode 1; versionName '0.1.0' }
+    defaultConfig { applicationId 'uk.co.collom.parkping'; minSdk 26; targetSdk 35; versionCode releaseVersionCode; versionName releaseVersionName }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
-    buildTypes { release { minifyEnabled false } }
+    signingConfigs {
+        release {
+            if (hasUploadSigning) {
+                storeFile file(uploadSigningValues[0])
+                storePassword uploadSigningValues[1]
+                keyAlias uploadSigningValues[2]
+                keyPassword uploadSigningValues[3]
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (hasUploadSigning) signingConfig signingConfigs.release
+        }
+    }
 }

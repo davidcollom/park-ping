@@ -34,7 +34,7 @@ Technical reference for contributors. For the visitor-facing overview, see [the 
 
 ## CI and tagged APKs
 
-Pushes and pull requests run the alert tests and build a development APK. Every pushed tag builds a versioned APK, verifies its signature, uploads an Actions artifact and attaches the APK and checksum to a GitHub Release.
+Pushes and pull requests run the alert tests and build a development APK. Every pushed tag builds a versioned APK and Gradle release AAB, validates the AAB with bundletool, uploads an Actions artifact and attaches the APK and checksum to a GitHub Release. When the separate Play upload-key secrets are configured, CI signs the AAB, verifies its signature, builds a universal APK with bundletool for device checks, and attaches the Play-ready AAB to the release. Without those secrets, the APK release still succeeds and CI retains an explicitly unsigned AAB artifact that cannot be uploaded to Play.
 
 For example, push a version tag after committing your changes:
 
@@ -43,7 +43,7 @@ git tag v0.1.1
 git push origin v0.1.1
 ```
 
-Tag releases are testing builds by default. Without a stable signing keystore configured, builds can have different signing certificates and Android may require uninstalling the previous version before installing the new one; uninstalling removes locally saved rules and favourites. Configure all four repository Actions secrets below before distributing builds that need reliable in-place updates. Never commit a private release signing key.
+Tag releases are testing builds by default. Without a stable GitHub APK signing keystore configured, APK builds can have different signing certificates and Android may require uninstalling the previous version before installing the new one; uninstalling removes locally saved rules and favourites. Configure all four repository Actions secrets below before distributing APKs that need reliable in-place updates. Never commit a private release signing key.
 
 | Optional Actions secret | Value |
 | --- | --- |
@@ -52,20 +52,25 @@ Tag releases are testing builds by default. Without a stable signing keystore co
 | `PARKPING_KEY_ALIAS` | Signing key alias |
 | `PARKPING_KEY_PASSWORD` | Key password |
 
-Configure all four together under Settings → Secrets and variables → Actions. Builds without them publish `park-ping-development.apk`; builds with them publish `park-ping.apk`. Tag names become the APK version name; CI assigns an increasing Android version code. Releases are marked as prereleases while phone testing is outstanding.
+Configure all four together under Settings → Secrets and variables → Actions. Builds without them publish `park-ping-development.apk`; builds with them publish `park-ping.apk`.
 
-For key creation and exact upload commands, see [SIGNING.md](../SIGNING.md).
+Configure the separate `PARKPING_UPLOAD_*` secrets documented in [SIGNING.md](../SIGNING.md) to sign the AAB for Play Console. The Play upload key is not the app signing key: Google Play App Signing uses a Google-managed app signing key for Play installs. GitHub APKs use a separate certificate, so switching between GitHub APKs and Play installs requires uninstalling; only updates within the same channel are compatible. The same tag workflow supplies both formats with `versionCode = 1000 + GitHub Actions run_number`; keep all Play tracks on that sequence and do not upload a higher code manually. Releases remain prereleases while phone testing is outstanding.
+
+With upload secrets configured, CI validates the signed AAB, builds a universal APK with bundletool, and installs/launches it on an Android API 35 emulator. Download the generated `park-ping-play-universal.apk` Actions artifact for optional physical-device checks. Then upload `park-ping-play.aab` to the Play internal testing track, install from Play, and verify a subsequent tagged release updates in place while preserving app state. The universal APK is upload-key-signed and does not test Play's app-signing certificate/update path. Play Console enrollment, track acceptance, and physical-device checks require maintainer access and are not performed by CI.
 
 ## Build and maintain
 
 Java 17 and Android Studio / Android SDK are required. Application ID: `uk.co.collom.parkping`. Minimum Android version: Android 8.0 (API 26); target/compile SDK: 35.
 
-Standard build:
+Standard local build and unsigned release bundle:
 
 ```bash
 ./test.sh
 ./gradlew assembleDebug lintDebug
+./gradlew bundleRelease
 ```
+
+Set `PARKPING_VERSION_CODE` and `PARKPING_VERSION_NAME` to override local bundle metadata. Local `bundleRelease` output is unsigned unless all four `PARKPING_UPLOAD_*` values are supplied; do not upload an unsigned bundle to Play.
 
 If a wrapper is not available, install Gradle 8.11.1 and run `gradle assembleDebug lintDebug`. Open the project folder in Android Studio to manage SDK setup and run on a connected device.
 
