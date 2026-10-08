@@ -22,12 +22,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '17'
-      - uses: android-actions/setup-android@v3
+      - uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
       - name: Install pinned Android SDK packages
@@ -180,7 +180,7 @@ jobs:
               sha256sum *.apk > SHA256SUMS
             fi
           )
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: park-ping-tagged-apk-${{ github.run_number }}
           path: |
