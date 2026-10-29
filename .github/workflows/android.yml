@@ -68,7 +68,7 @@ jobs:
             exit 1
           fi
           jarsigner -verify "$bundle"
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: park-ping-pr-smoke-aab-${{ github.run_number }}
           path: app/build/outputs/bundle/release/app-release.aab
@@ -78,7 +78,7 @@ jobs:
         env:
           PARKPING_APK_NAME: park-ping-test.apk
         run: ./build-apk.sh
-      - uses: actions/upload-artifact@v6
+      - uses: actions/upload-artifact@v7
         with:
           name: park-ping-test-apk
           path: app/build/manual/park-ping-test.apk
